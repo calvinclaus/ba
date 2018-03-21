@@ -1,0 +1,10 @@
+#lang ivy1.7
+
+action world
+
+action hello = {
+    call world
+}
+
+export hello
+import world
