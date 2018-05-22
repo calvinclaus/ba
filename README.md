@@ -1,12 +1,41 @@
-To build the Docker container
-```
-docker build -t ivy .
-```
+# Usage
 
-To run the Docker container with X-Window System. You have to adjust the path you want to mount into src to a path on your system.
-Also, be sure XQuartz has "Allow connections form network clients" enabled.
+## Setup
+
+Set up a `.env` file containing..
+
+### ...on Mac
+`
+DISPLAY={{YOUR_IP}}:0
+`
+You can get your IP via `ifconfig en0 | grep inet | awk '$1=="inet" {print $2}'`.
+This will change as you change Networks.
+
+Insall XQuartz. Be sure XQuartz has "Allow connections form network clients" enabled and disable "Authenticate connections"
 ```
 open -a XQuartz
-docker run -it -v /Users/Calvin/Dropbox/TU/6.Semester/ba/src/:/src -e DISPLAY=$(ifconfig en0 | grep inet | awk '$1=="inet" {print $2}'):0 ivy bash
 ```
+before running the container.
+
+### ...on Linux
+Run `echo $DISPLAY` and add the output to the .env file like so:
+`
+DISPLAY={{OUTPUT}}
+`
+
+## Running
+
+Build the Docker container via
+```
+docker-compose build
+```
+You only have to do this once or whenever the Dockerfile changes.
+
+From then on just run
+```
+docker-compose run from_source_ivy
+```
+
+
+Ivy is already installed and available via `ivy`.
 
