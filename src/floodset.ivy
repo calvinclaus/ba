@@ -1,0 +1,185 @@
+#lang ivy1.7
+
+include order
+
+type i
+interpret i -> int
+
+type value
+
+object node = {
+  instance t : iterable
+
+  #graph/system related
+  relation edge(A:t, B:t)
+  relation failed(N:t)
+  function val(X:node.t) : value
+  function default(X: node.t) : value
+  individual def : value
+
+  #state
+  relation w(N:t, V:value)
+  function rounds(SELF:t) : i
+  relation decision(SELF:t, VALUE:value)
+
+  #communication
+  relation message(N:t, V:value)
+  relation incomming_message(SELF:t, OTHER:t)
+
+  after init {
+    def := *;
+    default(N) := def;
+    rounds(N) := 0;
+    w(N, V) := V=node.val(N);
+    incomming_message(A, B) := false;
+    failed(N) := false;
+    decision(N, V) := false;
+  }
+
+  # step 1
+  action message_generation(self:t, other:t) = {
+    call maybe_fail(self);
+    if ~failed(self) {
+      if rounds(self) <= (system.f) {
+        message(self, M) := w(self, M);
+        incomming_message(other, self) := true;
+      };
+    };
+    call maybe_fail(self);
+  }
+
+
+  # step 2
+  action state_transition(self:t) = {
+    call maybe_fail(self);
+    if ~failed(self) {
+      rounds(self) := rounds(self)+1;
+      call update_w(self);
+      call maybe_decide(self);
+    };
+    call maybe_fail(self);
+  }
+
+  # 'private' util functions
+
+  action update_w(self:t) = {
+    var iter := node.t.iter.create(0);
+    while ~iter.is_end
+    invariant true
+    {
+      w(self, V) := incomming_message(self, iter.val) & message(iter.val, V);
+      iter := iter.next;
+    }
+  }
+
+  action maybe_decide(self:t) = {
+    if (rounds(self) = ((system.f)+1)) {
+      if exists V:value . w(self, V) & ~exists O . w(self, O) & O ~= V { # has single value
+        decision(self, V) := w(self, V);
+      } else {
+        decision(self, node.default(self)) := true;
+      }
+    };
+  }
+
+  action maybe_fail(self:t) = {
+    if ~failed(self) {
+      failed(self) := *;
+      var num:i;
+      call num := num_failed_nodes;
+      assume num <= system.f;
+    }
+  }
+}
+
+object system = {
+  individual f : i
+  individual rounds:i
+
+  after init {
+    rounds := 0;
+    var num: i;
+    call num := num_nodes;
+    assume f >= 0 & num > f;
+    node.edge(A, B) := true;
+    node.edge(A, A) := false;
+  }
+
+  action step = {
+    call step1;
+    call step2;
+    rounds := rounds+1;
+  }
+
+  #maybe these iterations can be replaced with an ensure in node.message_generation?
+  action step1 = {
+    var first_iter := node.t.iter.create(0);
+    while ~first_iter.is_end
+    invariant true
+    {
+      var second_iter := node.t.iter.create(0);
+      while ~second_iter.is_end
+      invariant true
+      {
+        var a := first_iter.val;
+        var b := second_iter.val;
+        if node.edge(a, b) {
+          call node.message_generation(a, b);
+        };
+        second_iter := second_iter.next;
+      };
+      first_iter := first_iter.next;
+    }
+  }
+
+  action step2 = {
+    var iter := node.t.iter.create(0);
+    while ~iter.is_end
+    invariant true
+    {
+      call node.state_transition(iter.val);
+    };
+    node.incomming_message(A, B) := false;
+    node.message(A, V) := false;
+  }
+}
+
+export system.step
+
+action num_nodes returns(num:i) = {
+  num := 0;
+  var iter := node.t.iter.create(0);
+  while ~iter.is_end
+  {
+    num := num+1;
+    iter := iter.next;
+  };
+}
+action num_failed_nodes returns(num:i) = {
+  num := 0;
+  var iter := node.t.iter.create(0);
+  while ~iter.is_end
+  {
+    if node.failed(iter.val) {
+      num := num+1;
+    };
+    iter := iter.next;
+  };
+}
+
+
+
+# All correct processes either haven't decided or decided on a single value
+invariant forall N. (~node.failed(N)) -> ((~exists V . node.decision(N, V)) | (exists V . node.decision(N, V) & ~exists F . node.decision(N, F) & V ~=F))
+
+# All correct processes agree on the decision
+invariant forall N,M. (~node.failed(N) & ~node.failed(M)) -> (node.decision(N, V) = node.decision(M, V))
+
+# If all processes start with v, then v is only possible decision
+invariant ((forall N,M . node.val(N) = node.val(M) )) -> (forall N . node.decision(N, node.val(N)) | (~exists V . node.decision(N, V)))
+
+# If not the only possible decision is v_0
+invariant ((exists N,M . node.val(N) ~= node.val(M) )) -> (forall N . node.decision(N, node.val(N)) | (~exists V . node.decision(N, V)))
+
+# All correct processes eventually decide
+invariant ((system.rounds >= system.f & system.rounds >= 1) -> (forall N . ~node.failed(N) -> (exists V . node.decision(N, V))))
