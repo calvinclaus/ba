@@ -1,8 +1,9 @@
 # Usage
 
-## Setup
+## Preparations
 
-Set up a `.env` file containing..
+As IVy can start a GUI we need to tell the Docker container our IP so that it can connect to our display.
+To do this, set up a `.env` file containing..
 
 ### ...on Mac
 `
@@ -23,7 +24,7 @@ Run `echo $DISPLAY` and add the output to the .env file like so:
 DISPLAY={{OUTPUT}}
 `
 
-## Running
+## Setup
 
 Build the Docker container via
 ```
@@ -35,9 +36,7 @@ From then on just run
 ```
 docker-compose run from_source_ivy
 ```
-
-
-Ivy is already installed and available via `ivy`, `ivy_check`, `ivy_show`.
+to start the container. Ivy is already installed and available via `ivy`, `ivy_check`, `ivy_show`.
 
 ## Work
 
