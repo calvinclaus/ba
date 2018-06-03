@@ -1,0 +1,89 @@
+#lang ivy1.7
+
+include order
+
+type i
+interpret i -> int
+
+type value
+
+object node = {
+  instance t : iterable
+
+  #graph/system related
+  function val(X:node.t) : value
+
+  #state
+  relation w(N:t, V:value)
+  function rounds(SELF:t) : i
+  relation decision(SELF:t, VALUE:value)
+
+  #communication
+  relation message(N:t, V:value)
+  relation incomming_message(SELF:t, OTHER:t)
+
+  after init {
+    w(N, V) := V=node.val(N);
+    #w(N, node.val(N)) := true;
+    incomming_message(A, B) := false;
+    decision(N, V) := false;
+  }
+
+  # step 1
+  action message_generation(self:t, other:t) = {
+    call maybe_fail(self);
+    call maybe_fail(self);
+  }
+
+
+  # step 2
+  action state_transition(self:t) = {
+    call maybe_fail(self);
+    rounds(self) := rounds(self)+1;
+    call update_w(self);
+    call maybe_decide(self);
+    call maybe_fail(self);
+  }
+
+  # 'private' util functions
+
+  action update_w(self:t) = {
+    var iter := node.t.iter.create(0);
+    while ~iter.is_end
+    invariant true
+    {
+      w(self, V) := incomming_message(self, iter.val) & message(iter.val, V);
+      iter := iter.next;
+    }
+  }
+
+  action maybe_decide(self:t) = {
+  }
+
+  action maybe_fail(self:t) = {
+  }
+}
+
+
+action num_nodes returns(num:i) = {
+  num := 0;
+  var iter := node.t.iter.create(0);
+  while ~iter.is_end
+  {
+    num := num+1;
+    iter := iter.next;
+  };
+}
+action num_failed_nodes returns(num:i) = {
+  num := 0;
+  var iter := node.t.iter.create(0);
+  while ~iter.is_end
+  {
+      num := num+1;
+    iter := iter.next;
+  };
+}
+
+
+
+invariant forall N,M . N~=M -> node.val(N) = node.val(M)

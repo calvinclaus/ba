@@ -1,0 +1,19 @@
+#lang ivy1.7
+
+type i
+interpret i -> int
+parameter f : i
+
+individual rounds : i
+
+after init  {
+  rounds := 0
+}
+
+action test = {
+  assume f >= 0
+}
+
+export test
+
+invariant (rounds > 0) -> (f >= 0)

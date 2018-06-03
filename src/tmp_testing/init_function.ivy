@@ -1,0 +1,13 @@
+#lang ivy1.7
+
+include order
+type value
+
+object node = {
+  instance t : iterable
+  function val(X:node.t) : value
+}
+
+
+
+invariant forall N,M . N~=M -> node.val(N) = node.val(M)

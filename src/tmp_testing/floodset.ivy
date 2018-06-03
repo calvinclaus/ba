@@ -1,0 +1,50 @@
+#lang ivy1.7
+
+type my_int
+interpret my_int -> int
+individual actual_faults : my_int
+
+type node
+type value
+
+relation channel(X:node, Y:node, CURRENT_MESSAGE: value)
+
+# States
+relation rounds(X:node, rounds:my_int)
+relation decision(X:node, DECISION: value) # absence of this relation encodes unknown decision
+relation received(X:node, V:value)
+
+object graph = {
+  individual past_rounds : my_int
+
+
+  after init {
+    require actual_faults >= 0;
+    past_rounds := 0;
+    channel(X, Y, null) := X ~= Y;
+  }
+
+  action send_messages = {
+    if past_rounds <= actual_faults {
+      for x, y in type node do
+        if some msg:value . channel(x, y, msg) {
+          channel(x, y, msg) : false
+          # here this approach fails because it doesn't model multiple messages on a channel
+          # we need a set to do this
+          channel(x, y,
+        } else {
+          ensure false
+        }
+
+      for every channel(X, Y, _) do
+        for every received(X, V) do
+          received(Y, V) := true
+      past_rounds := past_rounds + 1
+    }
+  }
+}
+
+export graph.send_messages
+
+invariant graph.past_rounds <= actual_faults+1
+invariant channel(X, Y, _) <-> (X ~= Y)

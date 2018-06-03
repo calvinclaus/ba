@@ -1,0 +1,49 @@
+
+module node = {
+  type rounds
+  interpret rounds -> int
+
+  type message
+  interpret message -> int
+
+
+  relation channel(X:node, Y:node, CURRENT_MSG:message)
+
+  after init {
+    rounds := 0
+  }
+
+  action send_messages {
+    if rounds <= f {
+
+    }
+  }
+
+
+}
+
+module set = {
+  type length
+
+
+  action
+}
+
+
+object graph = {
+  individual past_rounds : my_int
+
+
+  after init {
+    require max_rounds >= 0;
+    past_rounds := 0;
+    channel(X, Y) := X ~= Y;
+  }
+
+  action send_messages = {
+    if past_rounds < max_rounds {
+      past_rounds := past_rounds + 1
+    }
+  }
+}
+

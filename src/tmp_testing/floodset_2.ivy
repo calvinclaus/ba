@@ -1,0 +1,71 @@
+#lang ivy1.7
+
+object asgn = {
+  function val(X:node.t) : value.t
+  function default(X:node.t) : value.t
+}
+
+object system = {
+
+  action step1 = {
+    for node1 in type node1.t
+      for node2 in type node.t
+        if node.edge(node1, node2) {
+          # TODO either, or?
+          #call trans.send(node1, node2, node1.next_message(node1, node2))
+          node.incomming_message(node2, node1) := call node.next_message(node1, node2))
+        }
+  }
+
+  action step2(me: node.t) = {
+    for x in type node.t
+
+  }
+}
+
+object node = {
+  type t
+
+  relation edge(A:t, B:t)
+  relation w(N:t, V:value.t)
+
+  after init {
+    w(N, _) := false;
+    w(N, val(N)) := true;
+  }
+
+  function incomming_message(self:t, other:t) : unique_set.t
+
+  action next_message(self:t) returns (msg: unique_set.t) = {
+    for other in node.t {
+      if some msg : unique_set.t . incomming_message(self, other) = msg {
+
+      }
+      instance m : unique_set
+      m.add
+    }
+  }
+}
+
+module unique_set = {
+  type t
+
+  function next(M:t, V:value.t) : value.t
+
+  action get_next(self:t, value:value.t) returns (next_value:value.t) {
+    if some v:value.t . next(self, value) = v {
+      next_value := v;
+    } else {
+      next_value := null;
+    }
+  }
+
+  action add(self:t, value:value.t) = {
+    i
+  }
+
+}
+
+object value = {
+  type t
+}

@@ -1,0 +1,100 @@
+#lang ivy1.7
+
+
+type i
+interpret i -> int
+
+individual f : i
+
+#instance set : array(i,value)
+
+type value
+
+object node = {
+  type t
+
+  relation edge(A:t, B:t)
+  relation w(N:t, V:value)
+
+  relation message(N:t, V:value)
+
+
+  relation incomming_message(SELF:t, OTHER:t)
+
+  function rounds(SELF:t) : i
+
+  relation decision(SELF:t, VALUE:value)
+
+
+  after init {
+    rounds(N) := 0;
+    w(N, V) := false;
+    w(N, asgn.val(N)) := true;
+    incomming_message(A, B) := false;
+  }
+
+
+  action message_generation(self:t, other:t) = {
+    if rounds(self) <= f {
+      message(self, M) := w(self, M);
+      incomming_message(other, self) := true;
+    }
+  }
+
+  action update_w(self:t) = {
+    w(self, VALUE) := incomming_message(self, OTHER) & message(OTHER, VALUE);
+  }
+
+  action state_transition(self:t) = {
+    rounds(self) := rounds(self)+1;
+    call update_w(self);
+    if rounds(self) = f+1 {
+      # todo why no call keyword?
+      if has_single_value(self) {
+        decision(self, V) := w(self, V);
+      } else {
+        decision(self, asgn.default(self)) := true;
+      }
+    }
+  }
+
+
+  action has_single_value(self:t) returns(res:bool) = {
+    res := exists V:value . w(self, V) & ~exists O . w(self, O) & O ~= V;
+    #var counter : i := 0;
+    #for v in value {
+      #if w(self, V) {
+        #counter := counter+1;
+      #}
+    #}
+    #res := counter = 1;
+  }
+}
+
+object asgn = {
+  function val(X:node.t) : value
+  function default(X:node.t) : value
+}
+
+object system = {
+
+  action step1 = {
+    call message_generation_if_connected(A:node.t, B:node.t);
+  }
+
+  action message_generation_if_connected(a: node.t, b:node.t) = {
+    if node.edge(a,b) {
+     call node.message_generation(a, b);
+    }
+  }
+
+  action step2(me: node.t) = {
+    call node.state_transition(N:node);
+    node.incomming_message(A, B) := false;
+  }
+}
+
+
+
+
+

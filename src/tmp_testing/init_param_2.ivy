@@ -1,0 +1,12 @@
+#lang ivy1.7
+
+type i
+interpret i -> int
+parameter f : i
+
+
+after init  {
+  assume f >= 0
+}
+
+invariant (f >= 0)
