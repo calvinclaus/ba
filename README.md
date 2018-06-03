@@ -29,7 +29,7 @@ Build the Docker container via
 ```
 docker-compose build
 ```
-You only have to do this once or whenever the Dockerfile changes.
+This will take about 10 minutes as it is compiling a bunch of tools from source. However, you only have to do this once or whenever the Dockerfile changes.
 
 From then on just run
 ```
@@ -37,5 +37,9 @@ docker-compose run from_source_ivy
 ```
 
 
-Ivy is already installed and available via `ivy`.
+Ivy is already installed and available via `ivy`, `ivy_check`, `ivy_show`.
 
+## Work
+
+### Floodset
+To run the floodset proof: `ivy_check trace=true src/floodset.ivy`.
