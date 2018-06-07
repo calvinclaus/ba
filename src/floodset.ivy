@@ -45,7 +45,6 @@ object node = {
         incomming_message(other, self) := true;
       };
     };
-    call maybe_fail(self);
   }
 
 
@@ -57,7 +56,6 @@ object node = {
       call update_w(self);
       call maybe_decide(self);
     };
-    call maybe_fail(self);
   }
 
   # 'private' util functions
