@@ -168,16 +168,17 @@ action num_failed_nodes returns(num:i) = {
 
 
 # All correct processes either haven't decided or decided on a single value
-invariant forall N. (~node.failed(N)) -> ((~exists V . node.decision(N, V)) | (exists V . node.decision(N, V) & ~exists F . node.decision(N, F) & V ~=F))
+invariant exists V2 . (~node.failed(N)) -> (~node.decision(N,V1) | (node.decision(N, V2) & ~node.decision(N, F) | V2=F))
 
 # All correct processes agree on the decision
-invariant forall N,M. (~node.failed(N) & ~node.failed(M)) -> (node.decision(N, V) = node.decision(M, V))
+invariant (~node.failed(N) & ~node.failed(M)) -> (node.decision(N, V) = node.decision(M, V))
 
 # If all processes start with v, then v is only possible decision
-invariant ((forall N,M . node.val(N) = node.val(M) )) -> (forall N . node.decision(N, node.val(N)) | (~exists V . node.decision(N, V)))
+invariant exists N,M . (node.val(N) ~= node.val(M)) | node.decision(N2, node.val(N2)) | ~node.decision(N2, V)
 
 # If not the only possible decision is v_0
-invariant ((exists N,M . node.val(N) ~= node.val(M) )) -> (forall N . node.decision(N, node.val(N)) | (~exists V . node.decision(N, V)))
+invariant (node.val(N) = node.val(M)) | node.decision(N2, node.val(N2)) | ~node.decision(N2, V)
+
 
 # All correct processes eventually decide
 #conjecture eventually ~node.failed(N) -> (exists V . node.decision(N, V))
