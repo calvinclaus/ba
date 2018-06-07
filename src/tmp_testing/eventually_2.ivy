@@ -1,0 +1,13 @@
+#lang ivy1.7
+
+type node
+relation failed(N:node)
+
+after init {
+  failed(N) := false
+}
+action fail = {
+  failed(N) := true
+}
+
+conjecture eventually failed(N)

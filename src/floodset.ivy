@@ -182,4 +182,4 @@ invariant ((forall N,M . node.val(N) = node.val(M) )) -> (forall N . node.decisi
 invariant ((exists N,M . node.val(N) ~= node.val(M) )) -> (forall N . node.decision(N, node.val(N)) | (~exists V . node.decision(N, V)))
 
 # All correct processes eventually decide
-invariant ((system.rounds >= system.f & system.rounds >= 1) -> (forall N . ~node.failed(N) -> (exists V . node.decision(N, V))))
+#conjecture eventually ~node.failed(N) -> (exists V . node.decision(N, V))
