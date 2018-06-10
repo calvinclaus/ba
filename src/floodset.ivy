@@ -136,6 +136,7 @@ object system = {
     invariant true
     {
       call node.state_transition(iter.val);
+      iter := iter.next;
     };
     node.incomming_message(A, B) := false;
     node.message(A, V) := false;
