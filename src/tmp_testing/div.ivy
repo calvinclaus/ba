@@ -1,0 +1,18 @@
+#lang ivy1.7
+
+type i
+interpret i -> int
+
+object system = {
+  individual a: i
+  individual b: i
+  individual c : i
+}
+
+action do = {
+  var foo := (system.a)/(system.b);
+  system.c := foo;
+}
+
+export do
+
