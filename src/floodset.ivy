@@ -31,6 +31,7 @@ object node = {
     default(N) := def;
     rounds(N) := 0;
     w(N, V) := V=node.val(N);
+    assert exists V:value . w(N, V) & ~exists O . w(N, O) & O ~= V;
     incomming_message(A, B) := false;
     failed(N) := false;
     decision(N, V) := false;
@@ -63,7 +64,6 @@ object node = {
   action update_w(self:t) = {
     var iter := node.t.iter.create(0);
     while ~iter.is_end
-    invariant true
     {
       w(self, V) := incomming_message(self, iter.val) & message(iter.val, V);
       iter := iter.next;
@@ -113,11 +113,9 @@ object system = {
   action step1 = {
     var first_iter := node.t.iter.create(0);
     while ~first_iter.is_end
-    invariant true
     {
       var second_iter := node.t.iter.create(0);
       while ~second_iter.is_end
-      invariant true
       {
         var a := first_iter.val;
         var b := second_iter.val;
@@ -127,13 +125,12 @@ object system = {
         second_iter := second_iter.next;
       };
       first_iter := first_iter.next;
-    }
+    };
   }
 
   action step2 = {
     var iter := node.t.iter.create(0);
     while ~iter.is_end
-    invariant true
     {
       call node.state_transition(iter.val);
       iter := iter.next;
@@ -149,6 +146,7 @@ action num_nodes returns(num:i) = {
   num := 0;
   var iter := node.t.iter.create(0);
   while ~iter.is_end
+  invariant num >= 0
   {
     num := num+1;
     iter := iter.next;
@@ -158,6 +156,7 @@ action num_failed_nodes returns(num:i) = {
   num := 0;
   var iter := node.t.iter.create(0);
   while ~iter.is_end
+  invariant num >= 0
   {
     if node.failed(iter.val) {
       num := num+1;
@@ -167,19 +166,19 @@ action num_failed_nodes returns(num:i) = {
 }
 
 
-
 # All correct processes either haven't decided or decided on a single value
-invariant exists V2 . (~node.failed(N)) -> (~node.decision(N,V1) | (node.decision(N, V2) & ~node.decision(N, F) | V2=F))
+invariant ~node.failed(N) -> (node.decision(N, V) -> (~node.decision(N, O) | O=V))
 
 # All correct processes agree on the decision
 invariant (~node.failed(N) & ~node.failed(M)) -> (node.decision(N, V) = node.decision(M, V))
 
+
 # If all processes start with v, then v is only possible decision
-invariant exists N,M . (node.val(N) ~= node.val(M)) | node.decision(N2, node.val(N2)) | ~node.decision(N2, V)
+invariant exists N,M . (node.val(N) ~= node.val(M)) | node.decision(N2, node.default(N2)) | ~node.decision(N2, V)
 
 # If not the only possible decision is v_0
-invariant (node.val(N) = node.val(M)) | node.decision(N2, node.val(N2)) | ~node.decision(N2, V)
+invariant (node.val(N) = node.val(M)) | node.decision(N2, node.default(N2)) | ~node.decision(N2, V)
 
 
 # All correct processes eventually decide
-#conjecture eventually ~node.failed(N) -> (exists V . node.decision(N, V))
+invariant ((system.rounds >= system.f & system.rounds >= 1) -> (forall N . ~node.failed(N) -> (exists V . node.decision(N, V))))

@@ -1,2 +1,6 @@
 Unfortunately eventually doesn't work.
 Please see src/tmp_testing/eventually_2.ivy for minimal example that does not run.
+
+I am super confused why IVy does not complain about the formulas not bein in EPR.
+
+Just fogetting an iterator increment makes all invariants come out as TRUE!
