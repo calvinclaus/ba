@@ -1,2 +1,9 @@
 *.swp
 .env
++
+/paper/paper.aux
+/paper/paper.log
+/paper/paper.out
+/paper/paper.pdf
+/paper/paper.synctex.gz
+/paper/paper.txt

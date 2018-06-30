@@ -1,0 +1,449 @@
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+%\documentclass[twoside,twocolumn]{article}
+%\documentclass{article}[11pt]
+\documentclass[fleqn]{article}
+
+\usepackage{listings}
+
+\lstset{
+  xleftmargin=0em,
+}
+\usepackage{xcolor} %custom colours
+\usepackage{mdframed} %nice frames
+
+\definecolor{light-gray}{gray}{0.95} %the shade of grey that stack exchange uses
+
+%Put in the main document
+
+\usepackage{blindtext} % Package to generate dummy text throughout this template
+
+\usepackage[sc]{mathpazo} % Use the Palatino font
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+\linespread{1.05} % Line spacing - Palatino needs more space between lines
+\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+
+\usepackage{amsfonts}
+
+\usepackage{amsmath}
+
+\usepackage[english]{babel} % Language hyphenation and typographical rules
+
+\usepackage[hmarginratio=1:1,top=32mm,columnsep=20pt]{geometry} % Document margins
+\usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption} % Custom captions under/above floats in tables or figures
+\usepackage{booktabs} % Horizontal rules in tables
+
+\usepackage{lettrine} % The lettrine is the first enlarged letter at the beginning of the text
+
+\usepackage{enumitem} % Customized lists
+\setlist[itemize]{noitemsep} % Make itemize lists more compact
+
+\usepackage{abstract} % Allows abstract customization
+\renewcommand{\abstractnamefont}{\normalfont\bfseries} % Set the "Abstract" text to bold
+\renewcommand{\abstracttextfont}{\normalfont\small\itshape} % Set the abstract itself to small italic text
+
+\usepackage{titlesec} % Allows customization of titles
+\renewcommand\thesection{\Roman{section}} % Roman numerals for the sections
+\renewcommand\thesubsection{\roman{subsection}} % roman numerals for subsections
+\titleformat{\section}[block]{\large\scshape\centering}{\thesection.}{1em}{} % Change the look of the section titles
+\titleformat{\subsection}[block]{\fontsize{10}{10}\bfseries}{\thesubsection.}{1em}{} % Change the look of the section titles
+
+\usepackage{fancyhdr} % Headers and footers
+\pagestyle{fancy} % All pages have headers and footers
+\fancyhead{} % Blank out the default header
+\fancyfoot{} % Blank out the default footer
+\fancyhead[C]{Controlled Natural Language and Robotics $\bullet$ Calvin Claus} % Custom header text
+\fancyfoot[RO,LE]{\thepage} % Custom footer text
+
+\usepackage{titling} % Customizing the title section
+
+\usepackage{hyperref} % For hyperlinks in the PDF
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\setlength{\droptitle}{-4\baselineskip} % Move the title up
+
+\pretitle{\begin{center}\Huge\bfseries} % Article title formatting
+  \posttitle{\end{center}} % Article title closing formatting
+\title{Controlled Natural Languages and Robotics} % Article title
+\author{%
+  \textsc{Calvin Claus (1429713)}
+  \normalsize TU Wien\\ % Your institution
+  \normalsize \href{mailto:e1429713@student.tuwien.ac.at}{e1429713@student.tuwien.ac.at} % Your email address
+}
+\date{\today} % Leave empty to omit a date
+\renewcommand{\maketitlehookd}{%
+  \begin{abstract}
+    \noindent This paper gives a brief introduction into Controlled Natural Languages (CNLs), providing an overview over common language-rules and outlining the long term goals of CNL research. It describes how to construct a simple CNL interface to allow robots to receive human commands. Finally, it analyzes if a robot can successfully build a useful knowledge base over time, using CNL input by a human speaking naturally. It finds that, at the current state of CNL research, CNL can be used to build a good knowledge base, but the human has to unnaturally adapt his/her speaking to the fact that a robot should understand him/her, even though he/she is conforming to CNL rules.
+  \end{abstract}
+}
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+% Print the title
+\maketitle
+
+%----------------------------------------------------------------------------------------
+%	ARTICLE CONTENTS
+%----------------------------------------------------------------------------------------
+
+\section{Introduction}
+
+\lettrine[nindent=0em,lines=3]{I} t's a fascinating idea:
+
+\section{Ivy}
+Ivy is a system that is designed to verify safety of infinite-sate systems.
+It aims to assist protocol architects, algorithm authors, and the like in proofing the safety and correctness of their algorithm or protocol.
+
+\subsection{How Ivy is used}
+
+To understand how Ivy can be used, a common workflow that incorporates Ivy in algorithm verification is presented:
+
+\begin{enumerate}
+  \item design the algorithm
+    \begin{itemize}
+      \item purely creative task
+      \item Ivy offers no support in this area
+    \end{itemize}
+  \item encode it in Ivy language
+    \begin{itemize}
+      \item a one to one translation is most likely not possible
+      \item user must be ready for the paradigm and reasoning change when writing Ivy language as opposed to a procedural programming language
+    \end{itemize}
+  \item verify the properties one designed the algorithm to fulfil
+    \begin{itemize}
+      \item specify properties as invariants
+      \item make invariants inductive
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{Step 1 - algorithm design}
+Step 1 is executed entirely independently of Ivy. The Ivy language or the Ivy system do not provide any support in actually coming up with an algorithmic solution to a problem.
+The step is mentioned here to show the context the Ivy system can be used in: to answer the question "is an algorithm correct"?
+
+\subsubsection{Step 2 - encoding in Ivy language}
+Step 2 requires the user to understand the "unusual" \cite{refLanguageDoc} - compared to a procedural programming language -  Ivy language features. The user must
+find a way to use the Ivy language features to encode not only the algorithm itself but also the "system context" or "framework" in which the algorithm was designed to execute.
+For example, to reason about distributed consensus algorithms Lynch has defined a "context" or "framework" in which distributed algorithms operate.
+This is explained in detail later on in this work. Part of this framework describes that the network is defined as a graph, where edges can hold messages.
+The system executes two distinct steps: one in which messages can be sent and another in which the states of nodes are altered.
+The point is, both the algorithm and the framework in which it operates have to be flawlessly described through the Ivy language in this step. This process is
+fully creative and will - judging by the authors experience - most likely not allow a mindless one-to-one translation from a procedural algorithm.
+In this step the user also has to tell Ivy which methods (or "actions" in Ivy speak), e.g. \textit{connect\_to\_server(node)}, the environment can execute, . These actions are called "exported".
+These are the actions the final user of the algorithm would call, and it is our desire to proof correctness of these methods. Furthermore the user can supply
+the program with assertions, that they wish to proof cannot fail.
+
+\subsubsection{Step 3 - verification}
+The verification happens in step 3. The goal is to specify inductive invariants that describe the properties to be proven about the algorithm. "Inductive" is an important
+keyword here. An invariant is inductive iff the following three properties are satisfied:
+\begin{enumerate}
+  \item initiation: the invariant is true in all legal initial states
+  \item safety: for any program state that satisfies the invariant - regardless of whether this state is reachable - no exported action can cause an assertion failure starting in that state
+  \item consecution: for any program state that satisfies the invariant - regardless of whether this state is reachable - then after executing any exported action, the invariant remains satisfied
+\end{enumerate}
+Inductive invariants is one of the more difficult concepts to get ones head around, especially as a user who does not have any experience with automatic verification.
+Ivy does not consider the reachability of a system state.  As long as the state is in compliance with the invariants it is assumed to be reachable.
+The author of this paper needed some time to understand why Ivy generates counterexamples that are clearly not reachable, e.g. negative values for counters that are set to zero at initialization.
+To fix this one would have to make such the counter part of the invariant e.g. $invariant counter >= 0$.
+
+The name "Ivy" stems from "interactively verifying", which highlights the key differentiator of Ivy to Coq or Dafny.
+Ivy actively supports the user in the search for an inductive invariant by graphically displaying a concrete minimal counterexample to induction.
+The user can then generalize from the counterexample to strengthen the invariants. This counterexample $\rightarrow$ strengthened invariant $\rightarrow$ counterexample process continues
+until an inductive invariant is found and the correctness of the algorithm is proven. However, there is no mechanism in place that automatically disallows invariants that exclude reachable states.
+This means that it's easy to exclude theoretically reachable edge cases one hasn't thought of, by writing invariants that are too strong.
+
+\subsection{The Ivy language}
+The Ivy language is a core part of the Ivy system. It is the language through which the algorithm to be verified is defined.
+This section presents a selection of core language features that should help the reader understand the paradigm of modelling in Ivy, as well as lay the necessary foundation to understand
+the rest of the work presented in this paper. This section oversimplifies and does not give an exhaustive documentation, which is given in \cite{refLanguageDoc}.
+
+\subsubsection{Types and declarations}
+In Ivy one mainly uses uninterpreted types. ``Uninterpreted'' means that nodes in the system state are an arbitrary set with at least one element. The cardinality of this
+set is parameterized.  Meaning how many nodes are generated to construct a counter example to induction is entirely up to Ivy, one does not manually instantiate instances of these types.
+
+\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{lstlisting}
+type node
+\end{lstlisting}
+\end{mdframed}
+
+\noindent To relate instances of types to each other we can declare functions.
+
+\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{lstlisting}
+type node
+type value
+function value(N:node) -> value
+\end{lstlisting}
+\end{mdframed}
+
+\noindent A function that maps to bool can be declared as a relation, so
+
+\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{lstlisting}
+function message_received(RECEIVER:node, SENDER:node) -> bool
+\end{lstlisting}
+\end{mdframed}
+
+\noindent is the same as
+
+\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{lstlisting}
+relation message_received(RECEIVER:node, SENDER:node)
+\end{lstlisting}
+\end{mdframed}
+
+\subsubsection{Assignments}
+
+
+To assign values to relations, functions or variables $:=$ is used. To assign to multiple values
+at the same time one can use an uppercase placeholder. For example setting all nodes with an incoming message to failed:
+
+\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{lstlisting}
+failed(X) := ~incoming_message(X);
+\end{lstlisting}
+\end{mdframed}
+
+
+\subsubsection{Actions}
+To define a callable action, that is callable from within another action or from the environment if it is exported
+this is the syntax.
+
+\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{lstlisting}
+
+action fail_node_and_send(x:node) = {
+  fail(x) := true;
+  call send;
+}
+export fail_node_and_send
+
+action send = {
+  sent(X) := true;
+}
+\end{lstlisting}
+\end{mdframed}
+
+\subsubsection{Non deterministic choice}
+To assign to a variable, relation or function a value non-deterministically (randomly) one uses ``*''.
+This line non-deterministically chooses a number of nodes to have failed.
+
+\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{lstlisting}
+failed(X) := *;
+\end{lstlisting}
+\end{mdframed}
+
+\subsubsection{Assume, require and ensure}
+To specify safety conditions in an action we can use require and ensure.
+They both act like a traditional assert in that it does not allow control to pass if it is false.
+They are different semantically in that require assigns blame to the actions caller, while ensure
+is a condition that the action itself must guarantee. This is especially relevant to restrict
+the environment in the way it can call an action.
+
+Assume is different in that it does not allow control to pass through if the condition is not satisfied.
+The author has found this to be mostly useful in combination with non-deterministic assignments that one
+wants to restrict.
+
+The following action chooses a random node to assign to y, but will not allow control to pass if
+the chose node has failed. Therefore the actions will choose a random non failing node to send a message to x.
+If there is no node that hasn't failed, this action cannot terminate.
+
+\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{lstlisting}
+action random_node_sends_message_to(x:node) = {
+  y := *;
+  assume ~failed(y);
+  send(x, y);
+}
+\end{lstlisting}
+\end{mdframed}
+
+Assume simplifies modelling in some situations, as it can easily eliminate impossible behaviour. However,
+it is risky to use assume for the same reason: one might dismiss a valid counterexample to the specification
+by assuming it cannot happen.
+
+
+\subsubsection{Invariant}
+To specify the properties we want to proof about our algorithm we encode them in inductive invariants like so:
+
+\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{lstlisting}
+invariant system.rounds >= 0
+\end{lstlisting}
+\end{mdframed}
+
+These must hold at all times when an action is not executing, thus they have to be initially true and each of
+the exported actions must preserve them. However, an invariant is not guaranteed to hold when an action calls another action.
+
+
+\subsection{Decidability}
+Not all first-order formulas are decidable in Ivy. Therefore, the system defines a subset of first-order formulas as its decidable fragment.
+This not only constraints the structure of logical formuals but also functions. In Ivy only stratified functions are allowed. Meaning that if a graph was constructed
+with every type being a node and every function from a type A mapping to another type B would be represented as an edge the graph has to be cycle free. Thus there cannot be a function from
+$X \rightarrow Y$ and from $Y \rightarrow X$ in the same specification.
+
+Ivy is extremely vocal about this and will let the user know if his specification does not lie in the decidable fragment.
+
+
+\section{Distributed Consensus Algorithms with stopping failures}
+
+The algorithm that was implemented in Ivy as part of this work is called \textit{Floodset} and was taken out of Lynch's work ``Distributed Algorithms'' \cite{refNancy}.
+\textit{Floodset} is a consensus algorithm for synchronous networks that is designed to reach consensus in a network with failing processes.
+To understand \textit{Floodset}, one needs to first be made familiar with the aforementioned definition of the framework/system within which this algorithm operates
+
+\subsection{Framework - Synchronous Network Systems}
+
+The network of processes is represented as a directed graph $G=(V,E)$. Where $n$ is $|V|$ the number of nodes in the network. Each node represents a process in the network.
+The communication paths between nodes are represented by directed edges in the graph.
+$out-nbrs_i$ is the set of nodes to which an edge from node $i$ exists.
+$in-nbrs_i$ is the set of nodes from which an edge to node $i$ exists.
+$M$ denotes the message alphabet, meaning that elements of $M$ can be used to construct messages (vectors of elements of $M$) from nodes to other nodes.
+There are a number of components associated with each node:
+\begin{itemize}
+    \item $states_i$, a set of states (can be infinite)
+    \item $start_i$, a nonempty subset of $states_i$
+    \item $msgs_i$, a message generation function that maps $states_i X out-nbrs_i$ to elements of $M U {null}$
+    \item $trans_i$, a state transition function that maps $states_i X vectors of M index by in-nbrs_i$ to $states_i$
+\end{itemize}
+Thus, a node is always in some state in $states_i$. Importantly, the set of states is not necessarily finite, meaning that unbounded data structures like arrays can be modeled in the system.
+Each node defines a message generation function that uses the current state to return a message for each out neighbour. Similarly each node has a state transition function that is used to determine
+from the current state and all incoming messages the state the next state the node will transition to.
+
+The edges in the graph are called channels and can hold at most one message at a time or $null$ to denote an empty channel.
+The system of nodes operates in steps. It begins with all nodes in an arbitrarily chosen start state from $start_i$ and all channels empty.
+The processes then all repeatedly perform the following two steps \textit{synchronously}:
+\begin{itemize}
+  \item Apply the message generation function inputting the current state and one of the outgoing neighbours. Put these message in the channel to the chosen outgoing neighbour. Do this for each outgoing neighbour.
+  \item Apply the state transition function to the current state and the array of incoming messages. Transition the node to the returned state. Remove all messages from the channels.
+\end{itemize}
+\textit{Synchronously} in this case means that all nodes wait for each other to finish step1 before executing step2 and vice versa.
+The combinations of these two steps is a \textit{round}.
+
+\subsection{Stopping failures}
+The system presented in Lynch's work \cite{refNancy} is capable of modelling failure in a variety of ways.
+This work makes use of stopping failure only. This kind of failure occurs when a process stops in the middle of its execution. With regards to the presented framework this
+is modeled as a process failing before or after performing some instance of Step 1 or Step 2. Additionally, a process may also stop in the middle of performing Step 1. This allows
+the interesting situation in which a process has communicated its messages to some but not yet all processes. It is important to note that processes are not thought of performing
+the message generation operation sequentially. Instead, we say that the order in which messages are put in the channels is non-deterministic. This clarification, allows a failing process
+to send its messages to an arbitrary subset of its outgoing neighbours only.
+
+
+\subsection{Floodset}
+The problem at hand is as follows: An arbitrary number of processes start with individual inputs from a value set $V$. This is modeled by each node having at least one start state
+for every possible value $v ∈ V$. Also, a default value $v_0 ∈ V$ that is equal for all nodes is defined.
+Processes communicate with each other through several \textit{rounds}. The nature of their communication and its effect on their states is defined by their $msgs_i$ and $trans_i$ functions.
+Nodes may fail according to the \textit{stopping failure} model described above. The total number of failing processes is bounded by a constant $f$. The entire network knows the value of $f$ and
+can therefore utilise it in their state transition function.
+All processes that did not fail must eventually decide on a single value from the value set $V$. \textit{Deciding} is modeled by nodes setting a special \textit{decision} state component to a value in $V$.
+Their decision is subject to the following correctness conditions:
+\begin{itemize}
+  \item \textbf{Agreement}: No two processes decide on different values.
+  \item \textbf{Validity}: If all processes start with the same initial value $v ∈ V$, then $v$ is the only possible decision value
+  \item \textbf{Termination}: All nonfaulty processes eventually decide.
+\end{itemize}
+We assume the processes are in a complete, undirected graph. This means that every node has complete knowledge over the network. Channels are fully reliable - every message gets delivered.
+
+In the \textit{Floodset} algorithm processes hold a set $W$ as one of their state components. This set holds the subset of values of $V$ that the process has seen. Every node's initial $W$ holds only its initial value.
+In Step 1 of every round nodes broadcast their $W$. In Step 2 all $v ∈ V$ that \textit{(a)} are sent to a process and \textit{(b)} the process does not yet hold in its $W$ are added to its $W$. In the $f+1$th round
+a node decides: If $W$ is a singleton set then it decides on the unique element of $W$, otherwise it decides on the default value $v_0$.
+
+\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\noindent $states_i$:
+\begin{gather*}
+  rounds   \in  \mathbb{N}, \ \mathrm{initially} \ 0 \\
+  decision  \in  V \cup \{ unknown \}, \ \mathrm{initially} \ unknown \\
+  W \subseteq V, \ \mathrm{initially \ the\  singleton\  set\  consisting\  of\  i's\  initial\  value}
+\end{gather*}
+\end{mdframed}
+
+\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\noindent $msgs_i$:
+\begin{gather*}
+  if\ rounds \le f\ \mathrm{send}\ W\ \mathrm{to\ all\ other\ processes}
+\end{gather*}
+\end{mdframed}
+
+
+\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\noindent $trans_i$:
+\begin{gather*}
+  rounds\ :=\ rounds+1\\
+  \mathrm{let}\ X_j\ \mathrm{be\ the\ message\ from\ j,\ for\ each\ j\ from\ which\ a\ message\ arrives}\\
+  W\ :=\ W \cup \bigcup_{j} X_j\\
+  \mathrm{if}\ rounds = f+1\ \mathrm{then}\\
+  \ \ \   \mathrm{if}\ |W| = 0\ \mathrm{then}\ decision := v,\ \mathrm{where}\ W = {v}\\
+  \ \ \   \mathrm{else}\ decision := v_0
+\end{gather*}
+\end{mdframed}
+
+\noindent What follows is a proof of the correctness of the \textit{Floodset} algorithm to illustrate the principles behind it to the reader.
+
+Let $W_i(j)$ denote the value of $W$ for node $i$ in round $j$. The following Lemmas apply:\\
+
+\noindent \textbf{Lemma 1}:\\
+If no process fails during a particular round $r,\ 1 \le r \le f + 1$, then $W_i(r) = W_j(r)$ for all $i$ and $j$ that did not fail after $r$ rounds.\\
+\textbf{Proof}:\\
+\textit{Indirect}: If there exists a value $v \in V$ that is in $W_i(r)$ but not in $W_j(r)$ after round $r$ in which no process failed, that implies that some node $k$ sent a value to $i$ that it did not send to $j$, or $i$ failed to send a member of $W_i(r-1)$. Since all nodes broadcast their $W$, this is only possible if node $k$ or $i$ failed to send at least one message. But since no processes failed, each process must have shared their $W$ with every other process. \textit{Contradiction}. \\
+
+\noindent \textbf{Lemma 2}:\\
+Suppose that $W_i(r) = W_j(r)$ for all $i$ and $j$ that did not fail after $r$ rounds. Then for any round $r',\ r \le r' ≤ f + 1$, the same holds, that is, $W_i(r’) = W_j(r’)$ for all $i$ and $j$ that did not fail after $r’$ rounds.\\
+\textbf{Proof}:\\
+Since all active nodes after $r$ rounds have equal $W$s there exists no $v \in V$ that is in some $W_i(r),\ i \mathrm{some\ active\ node}$ that is not in every other $W_j(r),\ j \mathrm{any\ active\ node}$.
+Since nodes will only send their $W$s, this implies that no node can send a message in some future round $r'$ that contains a value $v$ that some node does not have in its $W$, thus $W_i(r’) = W_j(r’)$, $i,\ j$ not failed.\\
+
+\noindent \textbf{Lemma 3}:\\
+After $f+1$ rounds there has been a round $r'$ in which no process failed\\
+\textbf{Proof}:\\
+\textit{Indirect:} If a process failed in all of $f+1$ rounds at least on process must have failed in all of the $f+1$ rounds. This implies
+that at least $f+1$ processes failed. Only $f$ process can fail. \textit{Contradiction}.\\
+
+
+\noindent \textbf{Lemma 4}:\\
+If processes $i$ and $j$ are both active after $f+1$ rounds, then $W_i = W_j$ at the end of round $f + 1$.\\
+\textbf{Proof}:\\
+It follows from \textit{Lemma 3}, that after $f+1$ rounds at least one round, $r'$, in which no process failed, occurred. From \textit{Lemma 1} we therefore derive that $W_i(r') = W_j(r')$ for all active $i,\ j$.
+From \textit{Lemma 2} it follows that $W_i(f+1) = W_j(f+1)$. \textit{Q.e.d}.\\
+
+\noindent The Lemmas allow proofing the theorem:\\
+\noindent \textbf{Thorem}:\\
+\textit{Floodset} satisfies the correctness conditions.\\
+\textbf{Agreement}:\\
+From \textit{Lemma 4} we know what $W_i = W_j$ after $f+1$ rounds. Since all decision conditions are the same and only depend on $W$ agreement is satisfied.\\
+\textbf{Validity}:\\
+If all processes start with the same initial value $v ∈ V$, then there exists no value $v'$ that is part of any $W$. Thus, from $W_i(f+1) = W_j(f+1)$, $i,\ j$ active and $W_i(f+1) = \{v\}$ it follows
+that every active node decides $v$.\\
+\textbf{Termination}:\\
+Trivially, nodes decide after a fixed number of rounds, $f+1$.\\
+
+This work now presents a way to translate Lynch's framework and the \textit{Floodset} algorithm to a specification in the Ivy language.
+
+\section{Specification}
+
+
+\section{Evaluation}
+
+
+\section{Conclusion}
+This paper gave a brief introduction into Controlled Natural Languages (CNLs)
+
+%----------------------------------------------------------------------------------------
+%	REFERENCE LIST
+%----------------------------------------------------------------------------------------
+\begin{thebibliography}{99}
+
+    \bibitem{refLanguageDoc} http://microsoft.github.io/ivy/language.html
+    \bibitem{refNancy} http://microsoft.github.io/ivy/language.html
+\end{thebibliography}
+
+%----------------------------------------------------------------------------------------
+
+\end{document}
