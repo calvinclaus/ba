@@ -11,34 +11,30 @@ type t
 object node = {
 
   #graph/system related
-  relation edge(A:t, B:t) function val(X:t) : value
+  function val(X:t) : value
   function default(X: t) : value
   individual def : value
   relation failed(A:t)
   relation failed_before_round(A:t)
   relation failed_during_round(A:t)
-  relation tmp_failed(A:t)
+  relation has_single_value(N:t)
 
   #state
   relation w(SELF:t, V:value)
-  relation tmp_w(SELF:t, V:value)
-  function rounds(SELF:t) : i
   relation decision(SELF:t, VALUE:value)
 
   #communication
   relation message(N:t, V:value)
   relation incomming_message(SELF:t, OTHER:t)
-  relation incomming_message_mock(SELF:t, OTHER:t)
+  relation incomming_message_failing(SELF:t, OTHER:t)
 
   after init {
     def := *;
     default(N) := def;
-    rounds(N) := 0;
     w(N, V) := V=node.val(N);
     incomming_message(A, B) := false;
     decision(N, V) := false;
 
-    ensure(rounds(N)=0);
     ensure forall N . (exists V:value . w(N, V) & ~exists O . w(N, O) & O ~= V);
   }
 
@@ -46,59 +42,54 @@ object node = {
 }
 
 object system = {
-  individual rounds:i
   individual decision_round:bool
   individual clean_round_occured:bool
 
 
   after init {
-    rounds := 0;
     clean_round_occured := false;
     decision_round := false;
     node.failed_before_round(N) := false;
     node.failed(N) := false;
-
+    node.has_single_value(N) := false;
   }
 
   action round = {
-    assume ~node.decision(N,V);
-    assert ~decision_round;
+    require ~node.decision(N,V);
+    assume ~decision_round;
     node.failed_before_round(N) := node.failed(N);
     call step1_without_iter;
     call fail_nodes_during_step_1;
     clean_round_occured := (clean_round_occured | (forall N . ~node.failed_during_round(N)));
     if clean_round_occured {
-      decision_round := *;
+      decision_round := true;
     };
     call step2_without_iter;
-    rounds := rounds+1;
   }
 
   action step1_without_iter = {
-    node.message(A, M) := node.w(A, M);
+    node.message(A, M) := node.w(A, M) & ~node.failed(A);
     node.incomming_message(O, A) := ~node.failed(A);
   }
 
   action fail_nodes_during_step_1 = {
     node.failed_during_round(N) := *;
     assume node.failed_during_round(N) -> ~node.failed(N);
-    node.incomming_message_mock(O, F) := *;
-    node.incomming_message(O, F) := node.incomming_message(O,F) if ~node.failed_during_round(F) else node.incomming_message_mock(O, F);
+    node.incomming_message_failing(O, F) := *;
+    node.incomming_message(N, M) := (node.failed_during_round(M) & node.incomming_message_failing(N, M)) | (~node.failed_during_round(M) & node.incomming_message(N,M));
     node.failed(N) := (node.failed(N) | node.failed_during_round(N));
-    ensure node.failed_before_round(N) -> node.failed(N);
     assume exists N . ~node.failed(N);
+    ensure node.failed_before_round(N) -> node.failed(N);
+    ensure node.failed_during_round(N) -> node.failed(N);
   }
 
   action step2_without_iter = {
-    node.rounds(A) := node.rounds(A)+1;
-    node.tmp_w(A,V) := node.w(A, V);
-    node.w(A, V) := *;
-    assume (node.tmp_w(A, V) | ((node.incomming_message(A, J) & node.message(J, V)))) <-> node.w(A, V);
-
+    node.w(N,V) := (node.w(N,V) | (exists J . (node.incomming_message(N, J) & node.message(J, V))));
 
     if decision_round {
-      node.decision(A, V) := node.w(A, V)                if (exists V:value . (node.w(A, V) & ~exists O . node.w(A, O) & O ~= V)) else node.decision(A, V);
-      node.decision(A, node.default(A)) := (exists V:value . (node.w(A, V) & exists O . node.w(A, O) & O ~= V)) | (node.decision(A, node.default(A)));
+      node.has_single_value(N) := (exists J . node.w(N, J)) & (forall V,O . O=V | (node.w(N,V) -> ~node.w(N, O)));
+      node.decision(N, K) := node.has_single_value(N) & node.w(N,K) & ~node.failed(N);
+      node.decision(N, node.default(N)) := (~node.has_single_value(N) | node.decision(N, node.default(N))) & ~node.failed(N);
     };
 
     node.incomming_message(A, B) := false;
@@ -110,23 +101,23 @@ object system = {
 export system.round
 
 axiom exists N : t, M : t, O : t. N ~= M & N ~= O & M ~= O
+axiom exists N : value, M : value, O : value. N ~= M & N ~= O & M ~= O
 
 
-####### system invariants #######
+####### system correctness checks #######
 
-# only a number of nodes < f can fail ->  specified with assume
+# f < n
 invariant exists N . ~node.failed(N)
 
-# 'after' a node has failed it will not send anything
+# 'after' a node has failed it cannot start working again
 invariant node.failed_before_round(N) -> node.failed(N)
+# 'after' a node has failed it will not send anything
 invariant node.failed_before_round(N) -> ~node.incomming_message(M, N)
 
 # If the decision round occured, a clean round must have occured
 invariant system.decision_round -> system.clean_round_occured
 
-####### system invariants end #######
-
-
+####### system correctness checks #######
 
 
 
@@ -137,7 +128,7 @@ invariant node.decision(N, V) -> (~exists O . node.decision(N, O) & O~=V) # ever
 invariant system.decision_round -> ((~node.failed(A) & ~node.failed(B)) -> (node.decision(A, V) = node.decision(B, V)))
 
 # Validity: If all processes start with the same initial value v, then v is the only possible decision value
-invariant (exists N,M . node.val(N) ~= node.val(M)) | (system.decision_round -> node.decision(N2, node.val(N2)))
+invariant (exists N,M . node.val(N) ~= node.val(M)) | (system.decision_round -> (~node.failed(N2) -> node.decision(N2, node.val(N2))))
 
 # Termination: All nonfaulty processes eventually decide.
 invariant system.decision_round <-> (forall N . (~node.failed(N) -> (exists V . node.decision(N,V))))
@@ -149,12 +140,11 @@ invariant system.decision_round <-> (forall N . (~node.failed(N) -> (exists V . 
 
 ####### invariants necessary for induction #######
 
+# initial value is in W
 invariant node.w(N, node.val(N))
-invariant system.rounds >= 0
-invariant node.rounds(A) = system.rounds
-invariant (system.rounds = 0) -> (forall N . (exists V:value . node.w(N, V) & ~exists O . node.w(N, O) & O ~= V))
-invariant (system.rounds = 0) -> (forall N,V . ~node.decision(N,V))
+# the global default is the one the nodes know
 invariant node.default(N) = node.def
+# if a value is in a process' W, it must be initial value of some other process ( no invented values )
 invariant node.w(N, V) -> (exists M . node.val(M)=V)
 # lemma 1:
 invariant system.clean_round_occured -> ((~node.failed(A) & ~node.failed(B)) -> (node.w(A, V) = node.w(B, V)))
