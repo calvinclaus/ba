@@ -81,6 +81,7 @@ object system = {
     assume exists N . ~node.failed(N);
     ensure node.failed_before_round(N) -> node.failed(N);
     ensure node.failed_during_round(N) -> node.failed(N);
+    ensure node.failed_before_round(N) -> ~node.incomming_message(M, N);
   }
 
   action step2_without_iter = {
