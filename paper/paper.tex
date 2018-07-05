@@ -397,7 +397,7 @@ If no process fails during a particular round $r,\ 1 \le r \le f + 1$, then $W_i
 \noindent \textbf{Lemma 2}:\\
 Suppose that $W_i(r) = W_j(r)$ for all $i$ and $j$ that did not fail after $r$ rounds. Then for any round $r',\ r \le r' ≤ f + 1$, the same holds, that is, $W_i(r’) = W_j(r’)$ for all $i$ and $j$ that did not fail after $r’$ rounds.\\
 \textbf{Proof}:\\
-Since all active nodes after $r$ rounds have equal $W$s there exists no $v \in V$ that is in some $W_i(r),\ i \mathrm{some\ active\ node}$ that is not in every other $W_j(r),\ j \mathrm{any\ active\ node}$.
+Since all active nodes  have equal $W$s after $r$ rounds, there exists no $v \in V$ that is in some $W_i(r),\ i\ \mathrm{some\ active\ node}$ that is not in every other $W_j(r),\ j\ \mathrm{any\ active\ node}$.
 Since nodes will only send their $W$s, this implies that no node can send a message in some future round $r'$ that contains a value $v$ that some node does not have in its $W$, thus $W_i(r’) = W_j(r’)$, $i,\ j$ not failed.\\
 
 \noindent \textbf{Lemma 3}:\\
@@ -417,16 +417,20 @@ From \textit{Lemma 2} it follows that $W_i(f+1) = W_j(f+1)$. \textit{Q.e.d}.\\
 \noindent \textbf{Thorem}:\\
 \textit{Floodset} satisfies the correctness conditions.\\
 \textbf{Agreement}:\\
-From \textit{Lemma 4} we know what $W_i = W_j$ after $f+1$ rounds. Since all decision conditions are the same and only depend on $W$ agreement is satisfied.\\
+From \textit{Lemma 4} we know what $W_i = W_j$ after $f+1$ rounds. Since all decision conditions are the same and only depend on $W$, agreement is satisfied.\\
 \textbf{Validity}:\\
-If all processes start with the same initial value $v ∈ V$, then there exists no value $v'$ that is part of any $W$. Thus, from $W_i(f+1) = W_j(f+1)$, $i,\ j$ active and $W_i(f+1) = \{v\}$ it follows
+If all processes start with the same initial value $v \in V$, then there exists no value $v', v \neq v'$, that is part of any $W$. Thus, from $W_i(f+1) = W_j(f+1)$, $i,\ j$ active, and $W_i(f+1) = \{v\}$ it follows
 that every active node decides $v$.\\
 \textbf{Termination}:\\
-Trivially, nodes decide after a fixed number of rounds, $f+1$.\\
+Trivially, nodes decide after $f+1$ rounds.\\
 
 This work now presents a way to translate Lynch's framework and the \textit{Floodset} algorithm to a specification in the Ivy language.
 
 \section{Specification}
+To summarize: at hand we have a parameterized system with $n$ process and $f$ number of faults. We want to show \textit{Floodset} is correct regardless of the parameters. It is trivial to verify for a small number of $n,\ f$, but the question is ``does \textit{Floodset} work for any assignment of $n,\ f, n \lt f$''.
+To answer this question we are using the theorem proofer Ivy; first encoding the algorithm in the Ivy language and then constructing inductive invariants to proof the correctness.
+
+
 
 
 \section{Evaluation}
