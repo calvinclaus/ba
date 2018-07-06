@@ -1,32 +1,29 @@
 #lang ivy1.7
 
-include order
 
-type i
-interpret i -> int
 
 type value
 
-type t
+type node
 object node = {
 
   #graph/system related
-  function val(X:t) : value
-  function default(X: t) : value
+  function val(X:node) : value
+  function default(X: node) : value
   individual def : value
-  relation failed(A:t)
-  relation failed_before_round(A:t)
-  relation failed_during_round(A:t)
-  relation has_single_value(N:t)
+  relation failed(A:node)
+  relation failed_before_round(A:node)
+  relation failed_during_round(A:node)
+  relation has_single_value(N:node)
 
   #state
-  relation w(SELF:t, V:value)
-  relation decision(SELF:t, VALUE:value)
+  relation w(SELF:node, V:value)
+  relation decision(SELF:node, VALUE:value)
 
   #communication
-  relation message(N:t, V:value)
-  relation incomming_message(SELF:t, OTHER:t)
-  relation incomming_message_failing(SELF:t, OTHER:t)
+  relation message(N:node, V:value)
+  relation incomming_message(SELF:node, OTHER:node)
+  relation incomming_message_failing(SELF:node, OTHER:node)
 
   after init {
     def := *;
@@ -58,16 +55,16 @@ object system = {
     require ~node.decision(N,V);
     assume ~decision_round;
     node.failed_before_round(N) := node.failed(N);
-    call step1_without_iter;
+    call step1;
     call fail_nodes_during_step_1;
     clean_round_occured := (clean_round_occured | (forall N . ~node.failed_during_round(N)));
     if clean_round_occured {
-      decision_round := true;
+      decision_round := *;
     };
-    call step2_without_iter;
+    call step2
   }
 
-  action step1_without_iter = {
+  action step1 = {
     node.message(A, M) := node.w(A, M) & ~node.failed(A);
     node.incomming_message(O, A) := ~node.failed(A);
   }
@@ -84,8 +81,8 @@ object system = {
     ensure node.failed_before_round(N) -> ~node.incomming_message(M, N);
   }
 
-  action step2_without_iter = {
-    node.w(N,V) := (node.w(N,V) | (exists J . (node.incomming_message(N, J) & node.message(J, V))));
+  action step2 = {
+    node.w(N,V) := (node.w(N,V) | (node.failed(N) & exists J . (node.incomming_message(N, J) & node.message(J, V))));
 
     if decision_round {
       node.has_single_value(N) := (exists J . node.w(N, J)) & (forall V,O . O=V | (node.w(N,V) -> ~node.w(N, O)));
@@ -100,9 +97,6 @@ object system = {
 }
 
 export system.round
-
-axiom exists N : t, M : t, O : t. N ~= M & N ~= O & M ~= O
-axiom exists N : value, M : value, O : value. N ~= M & N ~= O & M ~= O
 
 
 ####### system correctness checks #######
@@ -126,7 +120,7 @@ invariant system.decision_round -> system.clean_round_occured
 
 # Agreement: No two processes decide on different values.
 invariant node.decision(N, V) -> (~exists O . node.decision(N, O) & O~=V) # every node decides on at most one value
-invariant system.decision_round -> ((~node.failed(A) & ~node.failed(B)) -> (node.decision(A, V) = node.decision(B, V)))
+invariant (~node.failed(A) & ~node.failed(B)) -> (node.decision(A, V) = node.decision(B, V))
 
 # Validity: If all processes start with the same initial value v, then v is the only possible decision value
 invariant (exists N,M . node.val(N) ~= node.val(M)) | (system.decision_round -> (~node.failed(N2) -> node.decision(N2, node.val(N2))))
