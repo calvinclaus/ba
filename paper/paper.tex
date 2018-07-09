@@ -105,15 +105,15 @@
 \lettrine[nindent=0em,lines=3]{I} t's a fascinating idea: taking any (distributed) algorithm and feeding it to
 some powerful tool that evaluates it's correctness automatically. However, the problem of verifying infinite state systems
 has not been effectively automated. Most of the systems currently in place require a user to annotate the
-specification with inductive invariants. IVy does not solve this problem but instead increases user friendliness.
+specification with inductive invariants. IVy does not solve this problem directly, but instead aims to increase user friendliness.
 
-IVy's underlying hypothesis is that ``automated methods are difficult to apply in practice not primarily because they are unreliable, but because they are opaque''; meaning that they fail in ways inexplicable to the user. In light of this, the IVy system was designed to display proof-failure comprehensively to the human user, making the root cause of errors more visible. \cite{ivy}
+IVy's underlying hypothesis is that ``automated methods are difficult to apply in practice not primarily because they are unreliable, but because they are opaque''; meaning that they fail in ways inexplicable to the user. In light of this, the IVy system was designed to display proof-failure comprehensively to the human user, making the root cause of errors more visible. \cite[ p.1]{ivy}
 
 This paper will give an introduction to the IVy system and its language. It will explain the paradigms underlying the automatic verification tool, its language and the context in which it may be employed.
 
 \textit{Floodset}, a simple distributed algorithm, will be explained and used as an example to illustrate the strengths and limitations of the IVy system in verifying algorithms operating in a network. The goal of this work is to give readers a foundational understanding of IVy and a head start in verifying their own distributed algorithms.
 
-This paper does not aim to be a comprehensive documentation of IVy or quantitatively compare IVy's effectiveness to other verification tools.
+This paper does not aim to be a comprehensive documentation or quantitatively compare IVy's effectiveness to other verification tools.
 
 \section{IVy}
 IVy is a system that is designed to verify correctness of infinite-sate systems.
@@ -148,7 +148,7 @@ The step is mentioned here to show the context the IVy system can be used in: to
 
 \subsubsection{Step 2 - encoding in IVy language}
 Step 2 requires the user to understand the "unusual" \cite{refLanguageDoc} - compared to a procedural programming language -  IVy language features. The user must
-find a way to use the IVy language features to encode not only the algorithm itself but also the \textit{system context} or \textit{framework} in which the algorithm was designed to execute.
+find a way to use the IVy language to encode not only the algorithm itself but also the \textit{system context} or \textit{framework} in which the algorithm was designed to execute.
 
 For example, to reason about distributed consensus algorithms Lynch has defined a \textit{framework} in which distributed algorithms operate.
 This is explained in detail later on in this work. Part of this \textit{framework} describes that the network is defined as a graph, where edges can hold messages.
@@ -156,22 +156,25 @@ The system executes two distinct steps: one in which messages can be sent and an
 The point is, both the algorithm and the \textit{framework} within which it operates have to be flawlessly described through the IVy language in this step.
 
 This process is fully creative and will most likely not allow a mindless one-to-one translation from a procedural algorithm.
-The user also has to tell IVy which methods (\textit{actions}) the environment can execute, e.g. \textit{connect\_to\_server(node)}. These actions are called \textit{exported}.
-These are the actions and end-user of the algorithm would call. It is our desire to proof correctness of these actions.
+The user also has to tell IVy which methods (\textit{actions}) the environment can execute, e.g. \textit{connect\_to\_server(node)}.
+These actions are called \textit{exported}, and constitute the actions an end-user of the algorithm would call. It is our desire to proof correctness of these actions.
 \subsubsection{Step 3 - verification}
-The verification happens in step 3. The goal is to specify inductive invariants that describe the properties to be proven about the algorithm. \textit{Inductive} is an important
-keyword here. An invariant is \textit{inductive} iff the following three properties are satisfied:
+The verification happens in step 3. The goal is to specify an inductive invariant that describes the properties to be proven about the algorithm. \textit{Inductive} is an important
+keyword here. An invariant is \textit{inductive} iff the following three properties are satisfied \cite{invariants}:
 \begin{enumerate}
   \item initiation: the invariant is true in all legal initial states
-  \item safety: for any program state that satisfies the invariant - regardless of whether this state is reachable - no \textit{exported} action can cause an invariant failure starting in that state
+  \item safety: for any program state that satisfies the invariant - regardless of whether this state is reachable - no \textit{exported} action can cause an assertion failure starting in that state
   \item consecution: for any program state that satisfies the invariant - regardless of whether this state is reachable - after executing any \textit{exported} action, the invariant remains satisfied
 \end{enumerate}
 As a user without any experience in automatic verification, \textit{inductive} invariants are a difficult concept.
 IVy does not consider the reachability of a system state.  As long as the state is in compliance with the invariants it is assumed to be reachable.
-The author of this paper needed some time to understand why IVy generates counterexamples that are clearly not reachable, e.g. negative values for counters that are set to zero at initialization.
-Every counter needs an invariant, e.g. $invariant\ counter \geq 0$.
+Thus, when IVy generates counterexamples that are clearly not reachable, e.g. negative values for counters that are set to zero at initialization,
+the solution is to specify an invariant that excludes these state, e.g. $invariant\ counter \geq 0$.
 
-The name "IVy" stems from "interactively verifying", which highlights the key differentiator of IVy to Coq or Dafny.
+When we say that the specified invariants need to be \textit{inductive} we mean the conjunction of the set of invariants specified throughout the entire program,
+not each invariant individually.
+
+The name "IVy" stems from "interactively verifying", which highlights the key differentiator of IVy to Coq or Dafny.\cite{ivy}
 IVy actively supports the user in the search for an inductive invariant by graphically displaying a concrete minimal counterexample to induction (CTI).
 The user can then generalize from the counterexample to strengthen the invariants. This counterexample $\rightarrow$ strengthened invariant $\rightarrow$ counterexample process continues
 until an inductive invariant is found and the correctness of the algorithm is proven.
@@ -291,11 +294,11 @@ To specify the properties we want to proof about our algorithm we encode them in
 \begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 invariant system.rounds >= 0
+invariant system.rounds < 100
 \end{lstlisting}
 \end{mdframed}
-These must hold at all times when an action is not executing, thus they have to be initially true and each of
+The conjunction of these must hold at all times when an action is not executing, thus they have to be initially true and each of
 the \textit{exported} actions must preserve them. However, an invariant is not guaranteed to hold when an action calls another action.
-
 
 \subsection{Decidability}
 Not all first-order formulas are decidable in IVy. Therefore, the system defines a subset of first-order formulas as its decidable fragment.
@@ -305,7 +308,7 @@ $X \rightarrow Y$ and from $Y \rightarrow X$ in the same specification.
 
 IVy is vocal about this and warns users about specifications that it thinks do not lie in the decidable fragment.
 However, IVy's check is conservative. It sometimes warns about specifications that are actually decidable. For this
-reason the check can be deactivated.
+reason IVy allows the check to be deactivated. \cite{decid}
 
 
 \section{Distributed Consensus Algorithms with stopping failures}
@@ -533,7 +536,7 @@ if clean_round_occured {
 \end{lstlisting}
 \end{mdframed}
 
-\noindent And an invariant that describes the properties of a clean round, that contains the premise of \textit{Lemma 1}:
+\noindent And an invariant that describes the properties of a clean round, which effectively is \textit{Lemma 1}:
 
 \begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
@@ -826,7 +829,8 @@ One can not trivially determine, that the specification in the IVy language is l
 This is compounded by the fact, that the IVy language is structurally unlike classical procedural languages. Making it challenging to achieve
 a one-to-one translation from a classical distributed algorithm in a language like C. An example of this is
 the relatively complicated quantifier-logic in assignments that update the global system state.
-A similar threat is posed by $assume$ statements. The author of this paper originally modeled the line
+
+Another threat is posed by $assume$ statements. The author of this paper originally modeled the line
 
 \begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
@@ -864,34 +868,40 @@ ensure ~(node.failed(N) &
 \end{mdframed}
 after the \textit{simulate\_failure} action. If IVy does not find a counterexample to this assert, the specification is erroneous.  In light of this, it would be beneficial to have a built in mechanism to verify the possibility of something to occur. In this case, it would allow one to verify, that the modeled system allows for the possibility of a node to fail such that it only sends messages to a subset of processes, as part of the final proof.
 
+It has become apparent, that successful verification with IVy is only possible with deep knowledge about how the algorithm functions. It is not a ``translate and go'' solution.
+Evidence of this include the complex invariant that requires knowledge about \textit{Lemma 1} or the alternative encoding for $f<n$ and the decision condition $if\ rounds = f+1$ that had to be discovered.
+
 Of course, a variety of bugs and exploits do not stem from a logically unsound algorithmic foundation but implementation errors. A wonderful example is the Heartbleed exploit in OpenSSL. It would have been no help to verify the simple Heartbleed protocol in IVy before implementing it in C, since the error was in an implementation detail allowing a buffer underflow. The point is, the implementation of the algorithm must be tested through unit testing or bounded model checkers, despite successful verification in IVy.
 
-Despite these limitations, IVy trumps similar tools in user friendliness by upping interactivity.
+Despite these limitations, IVy trumps similar tools in user friendliness by upping interactivity. \cite{ivy}
 IVy's counterexample to induction (CTI) viewer is remarkable, consistently showing truly minimal
-state configurations that allow the user to quickly grasp the implementation problem. The GUI also allows stepping
-through individual lines and their effect on the state. Therefore, if a user is capable of
-navigating the limitations with care, IVy is absolutely adequate for proving the logical soundness of
-an algorithmic concept.
+state configurations that allow the user to quickly grasp the problem. The GUI also allows stepping
+through individual lines and their effect on the state.
+
+Therefore, if a user is capable of navigating the limitations with care, IVy is absolutely adequate for proving the logical soundness of
+an algorithm.
 
 
 \section{Conclusion}
 This paper has presented the Ivy system and important Ivy language features. It classified IVy
 as part of a three step process of algorithm verification.
 It explained that its usage requires a readiness to let go of procedural programming paradigms
-for the logic oriented language. It gave an explanation of induction and inductive invariants,
+in favor of the logic oriented language. It gave an explanation of induction and inductive invariants,
 explaining what they are, how they are used by IVy to proof correctness and how they can be found.
 It presented some of the systems capabilities to verify distributed algorithms by example.
 
 It pointed out some limitations. One being that it is hard to know an algorithm was correctly specified in IVy. This is due to
 the lack of easy type iteration, which leads to complicated global assignments and a non-modular structure that is far off
-the original algorithm's. The paper suggested a mechanism to verify the possibility of a state to occur to alleviate this uncertainty.
-Another limitation was the difference between a logically sound algorithm and a correctly implemented one, and how IVy can only verify the former.
+the original algorithm's.
+The paper suggested a mechanism to verify the possibility of a state to occur, to alleviate this uncertainty.
+Another limitation that was found, is the difference between a logically sound algorithm and a correctly implemented one, and how IVy can only verify the former.
+It was stressed that successful verification of an algorithm that is not thoroughly understood by the user is unlikely.
 
 It highlighted the systems strengths to be user friendliness, interactivity and a powerful logic based language that allows for
 modeling of complex system state transitions in simple one-liners.
 
 It concludes that IVy's user friendliness in presenting CTIs - so long as the user is vary of the presented limitations - enables
-finding inductive invariants for proving logical soundness of an algorithm, relatively easily.
+finding inductive invariants for proving logical soundness of an algorithm relatively easily.
 
 
 
@@ -899,9 +909,12 @@ finding inductive invariants for proving logical soundness of an algorithm, rela
 %	REFERENCE LIST
 %----------------------------------------------------------------------------------------
 \begin{thebibliography}{99}
-
-    \bibitem{refLanguageDoc} http://microsoft.github.io/ivy/language.html
-    \bibitem{refNancy} http://microsoft.github.io/ivy/language.html
+    \bibitem{ivy} O. Padon, K. McMillan, A. Panda, M. Safiv, S. Shoham, ``Ivy: Safety Verification by Interactive Generalization'', Available \textit{https://www.cs.tau.ac.il/~odedp/ivy.pdf}
+    \bibitem{refLanguageDoc} ``The IVy language'',  \textit{http://microsoft.github.io/ivy/language.html} [Accessed: 5.06.18], 2017
+    \bibitem{invariants} ``Invariants'',  \textit{http://microsoft.github.io/ivy/examples/client\_server\_example.html} [Accessed: 5.06.18], 2017
+    \bibitem{decid} ``Decidability'',  \textit{http://microsoft.github.io/ivy/decidability.html} [Accessed: 5.06.18], 2017
+    \bibitem{refNancy} N. Lynch, ``Distributed algorithms'', 1996, San Francisco: Morgan Kaufmann Publishers
+    \bibitem{github} C. Claus, ``BA'', \textit{https://github.com/calvinclaus/ba}, 2018
 \end{thebibliography}
 
 %----------------------------------------------------------------------------------------
