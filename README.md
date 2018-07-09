@@ -41,4 +41,6 @@ to start the container. Ivy is already installed and available via `ivy`, `ivy_c
 ## Work
 
 ### Floodset
-To run the floodset proof: `ivy_check trace=true src/floodset.ivy`.
+To run the floodset proof with trace: `ivy_check trace=true complete=fo src/floodset.ivy`.
+To run the floodset proof with GUI: `ivy_check diagnose=true complete=fo src/floodset.ivy`.
+To run the floodset proof without interrupt: `ivy_check complete=fo src/floodset.ivy`.
