@@ -1,0 +1,150 @@
+General comments
+
+	- it is useful to add a single sentence at the beginning of every section, 
+	explaining what the section is about; it improves readability as it prepares 
+	the reader for what comes next
+
+	- I would refrain from using colloquial expressions (such as "figure out") 
+	
+Detailed comments
+
+	- the introduction can use a bit of structure. For example, you can start by 
+	explaining in a paragraph why it is useful to verify distributed algorithms, 
+	as they are designed and proved by hand. Then, in a second paragraph a short 
+	explanation about the difference of automatic and deductive verification, and 
+	how it is unfeasible to apply automatic verification to distributed algorithms 
+	(due to them being parameterized, and parameterized verification is 
+	undecidable in general [1]). Finally, say how Ivy is tailored to dealing with 
+	these kinds of algorithms, and is a tool that allows the user to provide 
+	invariants and check them automatically. Also, an outline of the rest of the 
+	thesis, explaining in a few words what each section is about can be added at 
+	the end of the introduction.
+	
+	- page 1, section (II), introductory paragraph: a few sentences about how IVy 
+	works could be useful at the beginning of this section. Consider moving the 
+	last paragraph from section (II.i.3) to this introductory paragraph
+	
+	- page 2, section (II.i): as we are not interested in algorithm design, but 
+	only in the verification of the designed algorithm, I suggest that the step 1 
+	of the workflow is omitted, and that the workflow is called "algorithm 
+	verification workflow"
+	
+	- page 2, section (II.i.2): the IVy language is a specification language, its 
+	code is not executed, so its features are not comparable to the features of a 
+	procedural language. I would not call the features unusual, they are required 
+	to be able to formally specify the behaviors of the systems we want to verify. 
+	
+	- page 2, section (II.i.2): add a citation to the Lynch book. Explain what the 
+	framework usually contains, for example, details about sending messages, 
+	network state, process ids, etc. The message here is that the user who writes 
+	the specification should have a clear understanding of how the algorithm 
+	works, and all the other assumptions about its executions that are not 
+	explicitly stated in the pseudocode
+	
+	- page 2, section (II.i.2): you mention actions, and them being called by the 
+	environment, but the reader does not yet know what IVy's environment is. 
+	Introduce IVy's environment in the introductory paragraph in section (II)
+	
+	- page 3, section (II.i.3): you state that the conjunction of all invariants 
+	must be inductive, but the separate invariants need not be. Is it not the case 
+	that when one of the individual invariants is not inductive, the whole 
+	conjunction is not inductive?
+	
+	- page 4, section (II.ii.2): explain the difference between upper and lower 
+	case placeholders in more detail
+
+	- page 5, section (II.ii.5): it is not clear what "it" refers to in the last 
+	sentence of this section
+	
+	- page 5, section (II.iii): first order logic is undecidable in general, but 
+	still many interesting properties can be expressed in a decidable fragment. 
+	Briefly mention which decidable fragments are captured by IVy. It is not clear 
+	to me what the last paragraph on this page states.
+
+	- page 6, section (III.i): mention that the presented framework is taken from 
+	Lynch's book.
+	
+	- page 6, section (III.i): mention that the failing processes cannot restart
+	
+	- page 7, section (III.iii): the algorithm runs on n processes, in the 
+	presence of f faults, with n > f, both n and f are parameters, and natural 
+	numbers. The first paragraph of this section is a mix of explanation of the 
+	algorithm and of the modeling. I would split the explanation of the algorithm 
+	and the details about modeling in two paragraphs. It is not clear to me what 
+	"complete knowledge over the network" means
+	
+	- page 8, section (III.iii): explicitly state that this algorithm has been 
+	proven correct in Lynch's book, and that the proofs are shortly presented 
+	here as well
+	
+	- page 9, section (IV.i): I would add an introductory paragraph for the 
+	section "Modeling strategy", and state that the remainder of the section 
+	contains some challenges that came across while using IVy, and how they were 
+	overcome
+	
+	- page 10, section (IV.i.2): instead of using the code "if round ...", maybe 
+	refer to it as the "decision condition", or "decision guard". Also, explain 
+	the why the formula \exists N. ~failed(N) captures f < n more intuitively
+	
+	- page 11, section (IV.ii): give more intuition about the encoding. Maybe 
+	explain in words the meaning of one function/relation of each 
+	graph/state/communication parts of the node
+	
+	- page 13: both section (IV.iii) and (IV.iv) are called "message sending", 
+	probably the second one should be called "state transition"
+	
+	- page 14, section (IV.v): in the text, you are referring to commands by line 
+	number, but the lines where the actual code is are not numbered. Also, this 
+	section lacks some intuition. Try to explain what subtleties there are when 
+	modeling the faults, and then focus on how it is modeled using the IVy code
+	
+	- page 14, section (IV.vi): I would move the explanation about the 
+	initialization before the sections explaining the steps 1 and 2
+	
+	- page 15, section (V): remind the reader about the meaning of the correctness 
+	conditions, and explain them informally before presenting how they are encoded 
+	in IVy
+	
+	- page 16, section (V): give an intuitive explanation about the invariants 
+	imposed by the framework. You could also pick one and explain it in plain 
+	English
+	
+	- page 17, section (VI): I think the message of this section is that one needs 
+	to have good understanding of the algorithm modeled, and the conditions under 
+	which it is supposed to work. Maybe you could add a bit more structure to it 
+	to make it more clear. Although the implementation is not verified, the goal 
+	is to verify the actual design of the algorithm before it is ever implemented, 
+	and this is where IVy comes useful. Also, I do not completely get what do you 
+	mean by "if would be beneficial to have a built in mechanism to verify the 
+	possibility of something to occur". If you find it appropriate, maybe it is 
+	also useful to report on the time IVy takes to check the invariants, and the 
+	time you spent in coming up with these invariants (a rough estimate is fine)
+	
+	- I would also mention that the properties checked by IVy are safety 
+	properties. Checking liveness is also possible, but one would need to 
+	construct a reduction of liveness to safety [2] which is out of the scope of 
+	this work
+
+Typos etc.
+
+	- page 1, introduction: it's -> it is, it's -> its
+	- page 1, introductory paragraph: "not to be satisfied" can be replaced by 
+	"to be violated"
+	- page 2, section (II.i.2): proof -> prove
+	- page 2, section (II.i.3): "As a user ..." -> "To a user ..."
+	- page 3, section (II.ii): "... the language through which *the behavior of* 
+	the algorithm is defined"
+	- page 3, section (II.ii.1): proofs -> proves
+	- page 3, section (II.ii.4): "*For example, * this line 
+	non-deterministically..."
+	- page 5, section (II.ii.6): proof -> prove
+	- page 6, section (III): "Lynch's work" -> "Lynch's book"
+	- page 9, section (III.iii): Thorem -> Theorem
+	- page 10, section (IV.i.2): couldn't -> could not
+	- page 13, section (IV.iii): don't -> do not, incomming_message -> 
+	incoming_message, hasn't -> has not
+	- page 17, section (VI): proof -> prove
+	
+	
+[1] http://www.cs.cornell.edu/~kozen/Papers/LimitsForAutomatic.pdf
+[2] https://www.cs.tau.ac.il/~odedp/reducing-liveness-to-safety-in-first-order-logic/
