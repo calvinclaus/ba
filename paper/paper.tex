@@ -102,18 +102,17 @@
 
 \section{Introduction}
 
-\lettrine[nindent=0em,lines=3]{I} t's a fascinating idea: taking any (distributed) algorithm and feeding it to
-some powerful tool that evaluates it's correctness automatically. However, the problem of verifying infinite state systems
-has not been effectively automated. Most of the systems currently in place require a user to annotate the
-specification with inductive invariants. IVy does not solve this problem directly, but instead aims to increase user friendliness.
+\lettrine[nindent=0em,lines=3]{D}istributed algorithms is a class of algorithms that is designed to run on a set of distributed processors. They solve important problems in distributed systems such as leader election, resource allocation and \textbf{consensus}. Consensus algorithms aim to create agreement among a set of processors. For example, an airplane may posses a redundant set of sensors measuring the same quantity. They must finally agree on a value that is as accurate as possible, while being able to handle failure of a subset of sensors. To establish agreement between sensors a distributed consensus algorithm may be used.  Currently these algorithms are proven by hand. In light of the relevance of distributed algorithms, it is useful to automatise the process of proving their correctness.
 
-IVy's underlying hypothesis is that ``automated methods are difficult to apply in practice not primarily because they are unreliable, but because they are opaque''; meaning that they fail in ways inexplicable to the user. In light of this, the IVy system was designed to display proof-failure comprehensively to the human user, making the root cause of errors more visible. \cite[ p.1]{ivy}
+  \textit{Automatic verification} takes an algorithm and exhaustively checks if the algorithm satisfies some specification. While this approach is conveniently fully automatic it is not applicable to infinite state systems as their state-space can, by definition, not be exhaustively searched. It is therefore not generally applicable to \textit{parameterized} distributed (consensus) algorithms, which take the number of processors communicating as a parameter.\cite{limits}
 
-This paper will give an introduction to the IVy system and its language. It will explain the paradigms underlying the automatic verification tool, its language and the context in which it may be employed.
+  On the other hand, \textit{deductive verification} takes an algorithm and some invariant. It proves the invariant is inductive with respect to the algorithm. If the invariant implies the correctness of the algorithm, the algorithm has been proven correct. This process does not exhaustively search all possible states and is therefore applicable to distributed (consensus) algorithms, however it relies on the user to annotate invariants.
 
-\textit{Floodset}, a simple distributed algorithm, will be explained and used as an example to illustrate the strengths and limitations of the IVy system in verifying algorithms operating in a network. The goal of this work is to give readers a foundational understanding of IVy and a head start in verifying their own distributed algorithms.
+  Ivy is tailored to simplify deductive verification of parameterized distributed algorithms. There are a variety of systems currently implementing the deductive verification process. IVy makes use of the same underlaying principle, but it aims to increase user friendliness of the verification process.  IVy's hypothesis is that ``automated methods are difficult to apply in practice not primarily because they are unreliable, but because they are opaque''; meaning that they fail in ways inexplicable to the user. In light of this, the IVy system was designed to display proof-failure comprehensively to the human user, making the root cause of errors more visible. \cite[ p.1]{ivy}
 
-This paper does not aim to be a comprehensive documentation or quantitatively compare IVy's effectiveness to other verification tools.
+  This paper will give an introduction to the IVy system and its language. It will explain the paradigms underlying the automatic verification tool, its language and the context in which it may be employed.  \textit{Floodset}, a simple distributed algorithm, will be explained and used as an example to illustrate the strengths and limitations of the IVy system in verifying algorithms operating in a network. First \textit{Floodset} will be manually proven and then deductively verified.  The goal of this work is to give readers a foundational understanding of IVy and a head start in verifying their own distributed algorithms.
+
+  This paper does not aim to be a comprehensive documentation or quantitatively compare IVy's effectiveness to other verification tools.
 
 \section{IVy}
 IVy is a system that is designed to verify correctness of infinite-sate systems.
@@ -909,6 +908,7 @@ finding inductive invariants for proving logical soundness of an algorithm relat
 %	REFERENCE LIST
 %----------------------------------------------------------------------------------------
 \begin{thebibliography}{99}
+    \bibitem{limits} K. Apt, D. Kozen ``Limits of Automatic Verification of Finite-State Concurrent Systems'', 1986, Available \textit{http://www.cs.cornell.edu/~kozen/Papers/LimitsForAutomatic.pdf}
     \bibitem{ivy} O. Padon, K. McMillan, A. Panda, M. Safiv, S. Shoham, ``Ivy: Safety Verification by Interactive Generalization'', Available \textit{https://www.cs.tau.ac.il/~odedp/ivy.pdf}
     \bibitem{refLanguageDoc} ``The IVy language'',  \textit{http://microsoft.github.io/ivy/language.html} [Accessed: 5.06.18], 2017
     \bibitem{invariants} ``Invariants'',  \textit{http://microsoft.github.io/ivy/examples/client\_server\_example.html} [Accessed: 5.06.18], 2017
