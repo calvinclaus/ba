@@ -539,41 +539,67 @@ invariant system.clean_round_occured ->
 \noindent The (other) chosen invariants will be explained in detail later on in this paper.
 
 \subsection{Types, functions, relations}
-First the types, functions, relations and individual variables that are used throughout the program are presented:
-
+First the types, functions, relations and individual variables that are used throughout the program are presented. They are annotated with comments explaining their purpose.  Their meaning will become more clear as the code is presented in the following paragraphs.
 
 \begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 type node
 type value
 object node = {
-  #graph/system related
-  function val(X:node) : value
-  function default(X: node) : value
-  individual def : value
-  relation failed(A:node)
-  relation failed_before_round(A:node)
-  relation failed_during_round(A:node)
-  relation has_single_value(N:node)
 
-  #state
+#graph/system
+  # stores the initial value of each X
+  function val(X:node) : value
+
+  # stores the default value of the network
+  individual def : value
+
+  # stores the default value that each node stores independently
+  function default(X: node) : value
+
+  # failed(a) is true if node a failed
+  relation failed(A:node)
+
+#state
+  # w(n, v) denotes whether n's w contains value v
   relation w(SELF:node, V:value)
+
+  # decision(n, v) denotes whether n has decided on v
   relation decision(SELF:node, VALUE:value)
 
-  #communication
+#communication
+  # message(n,v) denotes whether v is broadcast by n
   relation message(N:node, V:value)
+
+  # incomming_message(n,o) denotes whether node n received a message
+  # from node o
   relation incomming_message(SELF:node, OTHER:node)
+
+# internal helpers
+  # true if a node had already failed before this round
+  relation failed_before_round(A:node)
+
+  # true if a node failed during this round
+  relation failed_during_round(A:node)
+
+  # true if a node has a single value in w
+  relation has_single_value(N:node)
+
+  # helper to simulate non-determinstic message sending
   relation incomming_message_failing(SELF:node, OTHER:node)
+
+
 }
 
 object system = {
+  # true if current round is decision round
   individual decision_round:bool
+
+  # true if a clean round occured in the past, or the current round
   individual clean_round_occured:bool
 }
 \end{lstlisting}
 \end{mdframed}
-
-\noindent Their meaning will become clear as the code is presented in the following paragraphs.
 
 
 \noindent A round in the specification is defined as follows:
