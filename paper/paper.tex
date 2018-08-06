@@ -348,24 +348,19 @@ to send its messages to an arbitrary subset of its outgoing neighbours only. A p
 
 
 \subsection{Floodset}
-The problem at hand is as follows: An arbitrary number of processes start with individual inputs from a value set $V$. This is modeled by each node having at least one start state
-for every possible value $v \in V$. Also, a default value $v_0 \in V$ that is equal for all nodes is defined.
-Processes communicate with each other through several \textit{rounds}. The nature of their communication and its effect on their states is defined by their $msgs_i$ and $trans_i$ functions.
-Nodes may fail according to the \textit{stopping failure} model described above. The total number of failing processes is bounded by a constant $f$. The entire network knows the value of $f$ and
-can therefore utilise it in their state transition function.
-All processes that did not fail must eventually decide on a single value from the value set $V$. \textit{Deciding} is modeled by nodes setting a special \textit{decision} state component to a value in $V$.
-Their decision is subject to the following correctness conditions:
+The problem \textit{Floodset} solves is as follows: An arbitrary number of nodes (or processes) $n > 0$, in a complete, undirected network with fully reliable channels, start with individual inputs from a value set $V$ and a default value $v_0 \in V$ that is equal for all nodes. Processes should communicate with each other through several \textit{rounds} to eventually decide on a single value $v_d \in V$. Nodes may fail according to the \textit{stopping failure} model. The total number of failing processes is bounded by a constant $f < n$. The entire network knows the value of $f$.  The network should satisfy the following conditions:
+
 \begin{itemize}
   \item \textbf{Agreement}: No two processes decide on different values.
   \item \textbf{Validity}: If all processes start with the same initial value $v \in V$, then $v$ is the only possible decision value
   \item \textbf{Termination}: All nonfaulty processes eventually decide.
 \end{itemize}
-We assume the processes are in a complete, undirected graph. This means that every node has complete knowledge over the network. Channels are fully reliable - every message gets delivered.
 
-In the \textit{Floodset} algorithm processes hold a set $W$ as one of their state components. This set holds the subset of values of $V$ that the process has seen. Every node's initial $W$ holds only its initial value.
-In Step 1 of every round nodes broadcast their $W$. In Step 2 all $v \in V$ that \textit{(a)} are sent to a process and \textit{(b)} the process does not yet hold in its $W$ are added to its $W$. In the $f+1$th round
-a node decides: If $W$ is a singleton set then it decides on the unique element of $W$, otherwise it decides on the default value $v_0$.
+We refer to these condition as ``correctness conditions'', as we say the algorithm is ``correct'' if we can proof it satisfies these conditions.  \textit{Floodset} solves the described problem by defining $msgs$ and $trans$ functions for nodes in the network such that the conditions are satisfied.
 
+\textbf{Informal explanation of \textit{Floodset}}: Processes hold a set $W$ as one of their state components which holds the subset of values of $V$ that the process has seen. Every node's initial $W$ holds only its initial value.  In Step 1 of every round nodes broadcast their $W$. In Step 2 all $v \in V$ that \textit{(a)} are sent to a process and \textit{(b)} the process does not yet hold in its $W$ are added to its $W$. In the $f+1$th round a node decides: If $W$ is a singleton set then it decides on the unique element of $W$, otherwise it decides on the default value $v_0$.  \textit{Deciding} is modeled by nodes setting a special \textit{decision} state component to a value in $V$.
+
+\textbf{Formal definition of \textit{Floodset}}:
 \begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \noindent $states_i$:
 \begin{gather*}
