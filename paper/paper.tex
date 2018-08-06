@@ -295,14 +295,13 @@ The conjunction of these must hold at all times when an action is not executing,
 the \textit{exported} actions must preserve them. However, an invariant is not guaranteed to hold when an action calls another action.
 
 \subsection{Decidability}
-Not all first-order formulas are decidable in IVy. Therefore, the system defines a subset of first-order formulas as its decidable fragment.
-This constraints the structure of logical formuals and functions. In IVy only stratified functions are allowed. Meaning that a graph,
-with every type being a node and every function mapping from type $A$ to type $B$ be an edge from $A$ to $B$, has to be cycle free. Thus, there cannot be a function from
-$X \rightarrow Y$ and from $Y \rightarrow X$ in the same specification.
+First order logic is undecidable in general, but still many interesting properties can be expressed in a subset of first oder logic called the ``decidable fragment''. Ivy's documentation defines this subset of first-order formulas. \cite{decid}
 
-IVy is vocal about this and warns users about specifications that it thinks do not lie in the decidable fragment.
-However, IVy's check is conservative. It sometimes warns about specifications that are actually decidable. For this
-reason IVy allows the check to be deactivated. \cite{decid}
+For example, Ivy only allows stratified functions. Meaning that a graph, with every type being a node and every function mapping from type $A$ to type $B$ be an edge from $A$ to $B$, has to be cycle free. Thus, there cannot be a function from $X \rightarrow Y$ and from $Y \rightarrow X$ in the same specification.
+
+A detailed discussion about decidability lies outside of the scope of this work and is well documented in \cite{decide}.
+
+While a complete understanding of decidability in Ivy is advantageous, to use Ivy successfully it is not strictly necessary. This is because Ivy assists the user and tries to automatically determine if formulas lie outside of the decidable fragment. It warns users about specifications that it estimates are undecidable.  It must be noted that IVy's check is conservative as ``fully unfolding all of the definitions could be exponential''. Ivy may report specifications as undecidable which are in fact decidable. For this reason IVy allows the check to be deactivated. \cite{decid}
 
 
 \section{Distributed Consensus Algorithms with stopping failures}
