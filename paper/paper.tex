@@ -115,50 +115,28 @@
   This paper does not aim to be a comprehensive documentation or quantitatively compare IVy's effectiveness to other verification tools.
 
 \section{IVy}
-IVy is a system that is designed to verify correctness of infinite-sate systems.
-An algorithm or protocol is \textit{correct} or \textit{safe} if it cannot be called in any way that causes some pre-defined properties (assertions, invariants) not to be satisfied.
-IVy aims to assist protocol architects, algorithm authors, etc. in automatically proving the correctness of their algorithm or protocol.
+IVy is a system designed to verify correctness of infinite-sate systems using the aforementioned deductive approach. It takes as input a specification of an algorithm operating on system-state  and a set of invariants. It proofs the inductiveness of the invariants in respect to the algorithm, or displays a counterexample to induction. If the set of invariants entails the desired properties of the algorithm, and Ivy proved induction, then it was proven that the algorithm is \textit{correct}.
+
+In Ivy, the entity ``calling'' the algorithm in different state configurations is called the ``environment''. The environment conceptually represents the final users of the algorithm. An algorithm or protocol is \textit{correct} or \textit{safe} if it cannot be called by the environment in a state configuration that causes some pre-defined properties (assertions, invariants) not to be satisfied. IVy supports verification of systems that have multiple methods (\textit{actions}) exported to the environment. For example to verify servers that specify connection and disconnection algorithms. This can be thought of as proofing inductiveness of two independent algorithms with respect to the same invariants and system-state.
 
 \subsection{How IVy is used}
 
-A common protocol or algorithm creation workflow, which incorporates IVy for verification, is a three step process:
+A common algorithm verification workflow, which incorporates IVy for verification, is a two step process:
 
 \begin{enumerate}
-  \item algorithm or protocol design
-  \item encoding/specification in IVy language
+  \item encoding/specification of algorithm in IVy language
   \item correctness and safety verification
 \end{enumerate}
-%\begin{itemize}
-%  \item purely creative task
-%  \item IVy offers no support here
-%\end{itemize}
-%\begin{itemize}
-%  \item a one to one translation is most likely not possible
-%  \item user must be ready for the paradigm change when writing IVy language as opposed to a procedural programming language
-%\end{itemize}
-%\begin{itemize}
-%  \item specify correctness and safety conditions as invariants
-%  \item make invariants inductive
-%\end{itemize}
 
-\subsubsection{Step 1 - algorithm design}
-Step 1 is executed entirely independently of IVy. The IVy language or the IVy system do not provide any support in actually coming up with an algorithmic solution to a problem.
-The step is mentioned here to show the context the IVy system can be used in: to answer the question "is an algorithm correct"?
+\subsubsection{Step 1 - encoding in IVy language}
+Step 1 requires the user to understand the Ivy language. This language is a specification language tailored to describe state changes in a system. Ivy language code is inherently different from procedural languages, as it serves a different purpose and its logic is never executed. The Ivy documentation itself calls the language features "unusual" \cite{refLanguageDoc} so a user may need considerable effort to understand how to best use its tools.
 
-\subsubsection{Step 2 - encoding in IVy language}
-Step 2 requires the user to understand the "unusual" \cite{refLanguageDoc} - compared to a procedural programming language -  IVy language features. The user must
-find a way to use the IVy language to encode not only the algorithm itself but also the \textit{system context} or \textit{framework} in which the algorithm was designed to execute.
+Using their understanding of the Ivy language users have to encode their algorithm in it. However, distributed algorithms rarely exist in a vacuum. Algorithms such as \textit{Floodset} are defined within a \textit{system context} or \textit{framework} \cite{refNancy}, and make no sense without first defining this \textit{framework}. Thus users have to encode their algorithm together with the \textit{framework} in which the algorithm was designed to execute. This may include things such as network topology, the amount of processors that may fail, how and when processors fail, details about message sending, etc.
 
-For example, to reason about distributed consensus algorithms Lynch has defined a \textit{framework} in which distributed algorithms operate.
-This is explained in detail later on in this work. Part of this \textit{framework} describes that the network is defined as a graph, where edges can hold messages.
-The system executes two distinct steps: one in which messages can be sent and another in which the states of nodes are altered.
-The point is, both the algorithm and the \textit{framework} within which it operates have to be flawlessly described through the IVy language in this step.
+The encoding process therefore not only requires a clear understanding of how the algorithm works, but also of all assumptions about the context in which it executes. This process is therefore fully creative, requires deep understanding of the system as a whole, and will most likely not allow a mindless one-to-one translation from a procedural algorithm.
 
-This process is fully creative and will most likely not allow a mindless one-to-one translation from a procedural algorithm.
-The user also has to tell IVy which methods (\textit{actions}) the environment can execute, e.g. \textit{connect\_to\_server(node)}.
-These actions are called \textit{exported}, and constitute the actions an end-user of the algorithm would call. It is our desire to proof correctness of these actions.
-\subsubsection{Step 3 - verification}
-The verification happens in step 3. The goal is to specify an inductive invariant that describes the properties to be proven about the algorithm. \textit{Inductive} is an important
+\subsubsection{Step 2 - verification}
+The verification happens in step 2. The goal is to specify an inductive invariant that describes the properties to be proven about the algorithm. \textit{Inductive} is an important
 keyword here. An invariant is \textit{inductive} iff the following three properties are satisfied \cite{invariants}:
 \begin{enumerate}
   \item initiation: the invariant is true in all legal initial states
@@ -167,15 +145,13 @@ keyword here. An invariant is \textit{inductive} iff the following three propert
 \end{enumerate}
 As a user without any experience in automatic verification, \textit{inductive} invariants are a difficult concept.
 IVy does not consider the reachability of a system state.  As long as the state is in compliance with the invariants it is assumed to be reachable.
-Thus, when IVy generates counterexamples that are clearly not reachable, e.g. negative values for counters that are set to zero at initialization,
-the solution is to specify an invariant that excludes these state, e.g. $invariant\ counter \geq 0$.
+Thus, when IVy generates counterexamples that are clearly not reachable, e.g. negative values for counters that are set to zero at initialization, the solution is to specify an invariant that excludes these state, e.g. $invariant\ counter \geq 0$.
 
-When we say that the specified invariants need to be \textit{inductive} we mean the conjunction of the set of invariants specified throughout the entire program,
-not each invariant individually.
+When we say that the specified invariants need to be \textit{inductive} we mean the conjunction of the set of invariants specified throughout the entire program, not each invariant individually.
 
 The name "IVy" stems from "interactively verifying", which highlights the key differentiator of IVy to Coq or Dafny.\cite{ivy}
 IVy actively supports the user in the search for an inductive invariant by graphically displaying a concrete minimal counterexample to induction (CTI).
-The user can then generalize from the counterexample to strengthen the invariants. This counterexample $\rightarrow$ strengthened invariant $\rightarrow$ counterexample process continues
+The user can then generalize from the counterexample to strengthen the invariants. This \textit{counterexample} $\rightarrow$ \textit{strengthened invariant} $\rightarrow$ \textit{counterexample} process continues
 until an inductive invariant is found and the correctness of the algorithm is proven.
 
 \subsection{The IVy language}
