@@ -344,7 +344,7 @@ This work makes use of stopping failure only. This kind of failure occurs when a
 is modeled as a process failing before or after performing some instance of Step 1 or Step 2. Additionally, a process may also stop in the middle of performing Step 1. This allows
 the interesting situation in which a process has communicated its messages to some, but not all processes. It is important to note, that processes are not thought of performing
 the message generation operation sequentially. Instead, we say that the order in which messages are put in the channels is non-deterministic. This clarification, allows a failing process
-to send its messages to an arbitrary subset of its outgoing neighbours only.
+to send its messages to an arbitrary subset of its outgoing neighbours only. A process that has failed cannot restart at a later point in time.
 
 
 \subsection{Floodset}
