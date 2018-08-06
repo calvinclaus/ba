@@ -197,36 +197,56 @@ relation message_received(RECEIVER:node, SENDER:node)
 \end{lstlisting}
 \end{mdframed}
 
-\subsubsection{Assignments}
-
-
-To assign values to relations, functions or variables $:=$ is used. To assign to multiple values
-at the same time one can use an uppercase placeholder. For example, to set all nodes with an incoming message to \textit{failed}:
-
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
-\begin{lstlisting}
-failed(X) := ~incoming_message(X);
-\end{lstlisting}
-\end{mdframed}
-
-
 \subsubsection{Actions}
 The syntax to define an action, that is callable from within another action, or from the environment when \textit{exported} is:
 
 \begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 
-action fail_node_and_send(x:node) = {
-  fail(x) := true;
-  call send;
+action exported_action(x:node) = {
+  call internal_action;
 }
-export fail_node_and_send
+export exported_action
 
-action send = {
-  sent(X) := true;
+action  internal_action = {
+  . . .
 }
 \end{lstlisting}
 \end{mdframed}
+
+\subsubsection{Assignments}
+
+To assign values to relations, functions or variables $:=$ is used.
+\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{lstlisting}
+action our_action(x:node) = {
+  failed(x) := true;
+}
+\end{lstlisting}
+\end{mdframed}
+Lower case tokens refer to an individual value. In the code above \textit{x} refers to the specific instance of type \textit{node} that has been passed to \textit{our\_action}. The value of the relation \textit{failed(x)} is changed to \textit{true} only for that instance of \textit{node}.
+
+In Ivy one often wants to specify system-wide state-changes. For this reason Ivy allows iterator-free assignments involving all instances of a type. To make such an assignment one can use placeholders that are denoted by uppercase tokens. For example, to set all nodes without an incoming message to \textit{failed}:
+
+\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{lstlisting}
+failed(X:node) := ~incoming_message(X:node);
+\end{lstlisting}
+\end{mdframed}
+
+\noindent This is conceptually the same as the following pseudo-code:
+
+\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{lstlisting}
+# Pseudocode only:
+foreach x of type node {
+  failed(x) := ~incoming_message(x);
+}
+\end{lstlisting}
+\end{mdframed}
+
+The language only supports assignments where each placeholder that appears on the right hand side of an assignment is also on the left hand side.
+
 
 \subsubsection{Non deterministic choice}
 To non-deterministically assign to a variable, relation or function ``*'' is used.
@@ -245,7 +265,7 @@ However, they are different semantically: \textit{require} assigns blame to the 
 is a condition that the action itself must guarantee. \textit{Require} is especially relevant to restrict
 the environment in the way it can call an action.
 
-\textit{Assume} is used to exclude the possibility of something happening.  This is mostly useful in combination with non-deterministic assignments that one wants to restrict. The following action chooses a random node to assign to y, but will not allow control to pass if the chosen node has failed. Therefore the actions will choose a random non-failed node to send a message to x.  If there is no node that hasn't failed, this action cannot terminate.
+\textit{Assume} is used to exclude the possibility of something happening.  This is mostly useful in combination with non-deterministic assignments that one wants to restrict. The following action chooses a random node to assign to \textit{y}, but will not allow control to pass if the chosen node has failed. Therefore the actions will choose a random non-failed node to send a message to x.  If there is no node that hasn't failed, this action cannot terminate.
 
 \begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
@@ -257,10 +277,9 @@ action random_node_sends_message_to(x:node) = {
 \end{lstlisting}
 \end{mdframed}
 
-Assume simplifies modelling in some situations, as it can easily eliminate impossible behaviour. However,
-it is risky to use assume for the same reason: one might dismiss a valid counterexample to the specification
-by assuming it cannot happen. Putting $assume\ false$ at the beginning of any action will cause all checks on it
-to be positive.
+\textit{Assume} simplifies modelling in some situations, as it can easily eliminate impossible behaviour. However,
+it is risky to use \textit{assume} for the same reason: one might dismiss a valid counterexample to the specification
+by assuming it cannot happen. To give an extreme example, putting $assume\ false$ at the beginning of an exported action will cause all of Ivy's checks for induction to come out positive.
 
 
 \subsubsection{Invariants}
