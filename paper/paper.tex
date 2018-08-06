@@ -436,9 +436,10 @@ To summarize: we have a parameterized system with $n$ process and $f$ number of 
 It is trivial to verify for a small number of $n,\ f$, but the question is ``does \textit{Floodset} work for any assignment of $n,\ f,\ n < f$''.
 To answer this question the algorithm was encoded in the IVy language and then inductive invariants were constructed to proof correctness.
 
-The goal of this section is to walk through the specification step by step, to illustrate the paradigms relevant to automatic verification in IVy. The complete code, together with setup instructions of a Docker container, can be found here \cite{github}.
 
 \subsection{Modeling strategy}
+
+This section walks through the specification step by step. It illustrates the paradigms relevant to verification in IVy and presents the challenges that the author came across while specifying in IVy, and how they were overcome. The complete code, together with setup instructions of a Docker container, can be found here \cite{github}.
 
 \subsubsection{Modularity}
 When verifying an algorithm like \textit{Floodset} in IVy, an algorithm designer would prefer to translate their original algorithm to the IVy language in as close to a one-to-one fashion as possible. However, this is not quite convenient for \textit{Floodset} and the \textit{framework} it operates in.
