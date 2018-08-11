@@ -794,43 +794,61 @@ Line 7 to 12 is equivalent to the snippet of \textit{vii.2} and simulates the me
 
 \section{Verification}
 
-Now that the system has been modeled, the next step of verifying correctness with IVy is specifying inductive invariants. The simplest invariants to come up with are those, that describe the correctness of the algorithm at hand. In our case, these are \textit{agreement}, \textit{validity}, \textit{termination}.
+Now that the system has been modeled, the next step of verifying correctness with IVy is specifying inductive invariants. The simplest invariants to come up with are those, that describe the correctness of the algorithm at hand. In our case, the correctness is described by the \textit{correctness conditions} in \textit{iii}. These are \textit{agreement}, \textit{validity} and \textit{termination}.
+
+\subsection{Agreement}
+\textit{Agreement} states that no two correct process decide on different values. It can be described as follows.
 
 \begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
-####### Correctness Conditions #######
-
-# Agreement: No two processes decide on different values.
 invariant (~node.failed(A) & ~node.failed(B)) ->
             (node.decision(A,V) = node.decision(B,V))
+\end{lstlisting}
+\end{mdframed}
 
-# every node decides on at most one value
+Since the presented specification models deciding via a relation, it is theoretically possible for a node to decide on multiple values. To check against this possibility we demand every node may decide on at most one value.
+
+\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{lstlisting}
 invariant node.decision(N,V) -> (~exists O . node.decision(N,O) & O~=V)
+\end{lstlisting}
+\end{mdframed}
 
-# Validity: If all processes start with the same initial value v,
-#           then v is the only possible decision value
+\subsection{Validity}
+\textit{Validity} states: If all processes start with the same initial value v, then v is the only possible decision value.
+
+\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{lstlisting}
 invariant (exists N,M . node.val(N) ~= node.val(M)) |
           (system.decision_round ->
             (~node.failed(N2) -> node.decision(N2,node.val(N2))))
+\end{lstlisting}
+\end{mdframed}
 
-# Termination: All nonfaulty processes eventually decide.
+\subsection{Termination}
+\textit{Termination} states, that all non-faulty processes eventually decide.
+
+\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{lstlisting}
 invariant system.decision_round <->
             (forall N . (~node.failed(N) ->
                           (exists V . node.decision(N,V))))
 \end{lstlisting}
 \end{mdframed}
 
+\subsection{Invariants for Inductiveness}
 If one were to run $ivy\_check$ on the program without specifying any
 additional invariants, IVy finds that the \textit{agreement} invariant is not inductive,
 and produces a counter example to induction (CTI). The CTI can be drawn in a GUI.
-In the left hand section of the program we can see, that the system transitioned from state 0
+
+\noindent\includegraphics[width=\textwidth]{gui.png}
+
+\noindent In the left hand section of the program we can see, that the system transitioned from state 0
 to state 1 by executing \textit{round}. In the center IVy displays state 0, meaning the state
 before \textit{round} was executed. The brown edges specify the relation $w$, the purple edges
 show $val$.
 
-\noindent\includegraphics[width=\textwidth]{gui.png}
-
-\noindent State 0 shows, that no node has their initial value, modeled by $val$,
+State 0 shows, that no node has their initial value, which is modeled by the relation $val$,
 in its $w$. The user must now realise, that this is an unreachable state, and exclude it by coming
 up with an invariant.
 
@@ -842,22 +860,23 @@ invariant node.w(N, node.val(N))
 \end{lstlisting}
 \end{mdframed}
 
-The method for finding the remaining invariants is similar: Execute $ivy\_check$ $\rightarrow$ examine CTI $\rightarrow$ design invariant $\rightarrow$ execute $ivy\_check$.
+The method for finding the remaining invariants is identical: Execute $ivy\_check$ $\rightarrow$ examine CTI $\rightarrow$ design invariant $\rightarrow$ execute $ivy\_check$. The following snippets presents the necessary invariants for induction annotated with comments.
 \begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 # the global default is the one the nodes know
 invariant node.default(N) = node.def
+
 # if a value is in a process' W, it must be initial value of
 # some other process (no invented values)
+
 invariant node.w(N, V) -> (exists M . node.val(M)=V)
+
 # lemma 1:
 invariant system.clean_round_occured ->
             (~node.failed(A) & ~node.failed(B)) ->
               (node.w(A, V) = node.w(B, V)))
 \end{lstlisting}
 \end{mdframed}
-
-
 
 Since it is also required that the \textit{framework} behaves correctly it makes sense to include some
 correctness conditions specifically aimed at the system.
