@@ -168,7 +168,7 @@ The cardinality of this set is \textit{parameterized}, meaning IVy proofs correc
 The number of values of a type that are generated to construct a counter example to induction (CTI) is entirely up to IVy. No instances of these types are manually instantiated.
 This is useful for declaring types such as \textit{node}, \textit{process} or \textit{value} in a system.
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 type node
 \end{lstlisting}
@@ -176,7 +176,7 @@ type node
 
 \noindent To relate instances of types to each other we can declare functions.
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 type node
 type value
@@ -186,7 +186,7 @@ function value(N:node) -> value
 
 \noindent A function that maps to bool can be declared as a relation, so
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 function message_received(RECEIVER:node, SENDER:node) -> bool
 \end{lstlisting}
@@ -194,7 +194,7 @@ function message_received(RECEIVER:node, SENDER:node) -> bool
 
 \noindent is the same as
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 relation message_received(RECEIVER:node, SENDER:node)
 \end{lstlisting}
@@ -203,7 +203,7 @@ relation message_received(RECEIVER:node, SENDER:node)
 \subsubsection{Actions}
 The syntax to define an action, that is callable from within another action, or from the environment when \textit{exported} is:
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 
 action exported_action(x:node) = {
@@ -220,7 +220,7 @@ action  internal_action = {
 \subsubsection{Assignments}
 
 To assign values to relations, functions or variables $:=$ is used.
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 action our_action(x:node) = {
   failed(x) := true;
@@ -231,7 +231,7 @@ Lower case tokens refer to an individual value. In the code above \textit{x} ref
 
 In Ivy one often wants to specify system-wide state-changes. For this reason Ivy allows iterator-free assignments involving all instances of a type. To make such an assignment one can use placeholders that are denoted by uppercase tokens. For example, to set all nodes without an incoming message to \textit{failed}:
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 failed(X:node) := ~incoming_message(X:node);
 \end{lstlisting}
@@ -239,7 +239,7 @@ failed(X:node) := ~incoming_message(X:node);
 
 \noindent This is conceptually the same as the following pseudo-code:
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 # Pseudocode only:
 foreach x of type node {
@@ -255,7 +255,7 @@ The language only supports assignments where each placeholder that appears on th
 To non-deterministically assign to a variable, relation or function ``*'' is used.
 This line non-deterministically chooses a number of nodes to have failed.
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 failed(X) := *;
 \end{lstlisting}
@@ -270,7 +270,7 @@ the environment in the way it can call an action.
 
 \textit{Assume} is used to exclude the possibility of something happening.  This is mostly useful in combination with non-deterministic assignments that one wants to restrict. The following action chooses a random node to assign to \textit{y}, but will not allow control to pass if the chosen node has failed. Therefore the actions will choose a random non-failed node to send a message to x.  If there is no node that hasn't failed, this action cannot terminate.
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 action random_node_sends_message_to(x:node) = {
   y := *;
@@ -288,7 +288,7 @@ by assuming it cannot happen. To give an extreme example, putting $assume\ false
 \subsubsection{Invariants}
 To specify the properties we want to proof about our algorithm we encode them in special assertions called \textit{invariants}:
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 invariant system.rounds >= 0
 invariant system.rounds < 100
@@ -364,7 +364,7 @@ We refer to these condition as ``correctness conditions'', as we say the algorit
 \textbf{Informal explanation of \textit{Floodset}}: Processes hold a set $W$ as one of their state components which holds the subset of values of $V$ that the process has seen. Every node's initial $W$ holds only its initial value.  In Step 1 of every round nodes broadcast their $W$. In Step 2 all $v \in V$ that \textit{(a)} are sent to a process and \textit{(b)} the process does not yet hold in its $W$ are added to its $W$. In the $f+1$th round a node decides: If $W$ is a singleton set then it decides on the unique element of $W$, otherwise it decides on the default value $v_0$.  \textit{Deciding} is modeled by nodes setting a special \textit{decision} state component to a value in $V$.
 
 \textbf{Formal definition of \textit{Floodset}}:
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \noindent $states_i$:
 \begin{gather*}
   rounds   \in  \mathbb{N}, \ \mathrm{initially} \ 0 \\
@@ -373,7 +373,7 @@ We refer to these condition as ``correctness conditions'', as we say the algorit
 \end{gather*}
 \end{mdframed}
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \noindent $msgs_i$:
 \begin{gather*}
   if\ rounds \le f\ \mathrm{send}\ W\ \mathrm{to\ all\ other\ processes}
@@ -381,7 +381,7 @@ We refer to these condition as ``correctness conditions'', as we say the algorit
 \end{mdframed}
 
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \noindent $trans_i$:
 \begin{gather*}
   rounds\ :=\ rounds+1\\
@@ -448,7 +448,7 @@ This section walks through the specification step by step. It illustrates the pa
 When verifying an algorithm like \textit{Floodset} in IVy, an algorithm designer would prefer to translate their original algorithm to the IVy language in as close to a one-to-one fashion as possible. However, this is not quite convenient for \textit{Floodset} and the \textit{framework} it operates in.
 To separate system logic and node logic one would have to rely heavily on iterations. E.g. for \textit{Step 1} the system would iterate over all nodes and let each node take care of sending it's own message.
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 action round = {
   var iter := node.t.iter.create(0);
@@ -470,7 +470,7 @@ export round
 
 \noindent However, the code above does not actually execute an iteration over all nodes as one would expect. Looking at an IVy trace we see what really happens:
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 . . .
 line 3: message := *;
@@ -480,7 +480,7 @@ line 3: incomming_message := *;
 \end{mdframed}
 
 IVy non-deterministically assigns to all relations involved in the loop, instead of actually executing the loop.  This is because proving correctness of loops can only be done through inductive loop invariants specified by a human. IVy therefore allows specifying invariants together with a loop.
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
   while ~iter.is_end
   invariant node.message(N,V) = node.w(N,V)
@@ -493,7 +493,7 @@ IVy non-deterministically assigns to all relations involved in the loop, instead
 
 These invariants must hold before the loop and after every iteration. The following is a trace of the execution of the loop with the specified invariants. First, they are asserted, then the relations are set to non-deterministic values, and finally an assume is used to restrict control to relation assignments that fulfil the invariants.
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 assert message(N,V) = w(N,V)
 assert N:t <= t.iter.val(loc:iter) -> incomming_message(O,N)
@@ -518,7 +518,7 @@ The assumption $f<n$, ``number of failed nodes is bounded to an amount smaller t
 
 To figure out how to alternatively encode the \textit{decision condition} deep understanding of the algorithm is necessary. One must realise that $rounds = f+1$ entails that a ``clean round'' occurred (see \textit{Lemma 3}). Where ``clean round'' describes ``a round in which no node failed''. The processes are ready to decide after a clean round has occurred. They can decide either immediately, or an arbitrary number of rounds after the clean round. This can be modeled with non-determinism:
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 clean_round_occured := (clean_round_occured |
                         (forall N . ~node.failed_during_round(N)));
@@ -530,7 +530,7 @@ if clean_round_occured {
 
 \noindent And an invariant that describes the properties of a clean round, which effectively is \textit{Lemma 1}:
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 # lemma 1:
 invariant system.clean_round_occured ->
@@ -611,7 +611,7 @@ proving correctness, IVy requires the initialisation to entail the invariants. A
 that are not assigned are set non-deterministically by the environment. E.g. $node.val(N)$ is
 treated as a parameter the environment sets.
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 after init {
   def := *;
@@ -631,7 +631,7 @@ after init {
 \subsection{Rounds}
 
 \noindent A round in the specification is defined as follows:
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 action round = {
   require ~node.decision(N,V) & ~decision_round;
@@ -667,7 +667,7 @@ The actual delivery of a message is modeled via the $incomming\_message(RECIPIEN
 These relations allow us to use IVy's assignments to easily model \textit{Step 1} in a round of \textit{Floodset}.
 Line 2 assigns for all nodes $A$ and values $V$ to $message(A,V)$ the boolean value of $node.w(A,V) \land \neg failed(A)$. In other words, every node that hasn't failed prepares a message with all values in its $w$. Line 3 states that all nodes that haven't failed send messages to all other nodes.
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 action step1 = {
   node.message(A,V) := node.w(A,V) & ~node.failed(A);
@@ -683,7 +683,7 @@ The conditional statement in Line 4 corresponds to the \textit{decision conditio
 they decide on the default value.
 Finally, for good measure, $incomming\_message$ and $message$ are reset, but this is not necessary for the proof.
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 action step2 = {
   node.w(N,V) := (node.w(N,V) |
@@ -718,7 +718,7 @@ action step2 = {
 This section shows how the stopping failure model described by Lynch \cite{refNancy} and explained in \textit{section III ii.} was modeled in Ivy.
 
 To recap, a process may fail before or after performing some instance of Step 1 or Step 2 as well as in the middle of performing Step 1.  The presented code for actions \textit{step1} and \textit{step2} already correctly considers the behaviour of nodes that failed before the actions. E.g. \textit{step1} only allows nodes that have not failed to send messages.
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 . . .
 node.incomming_message(O,A) := ~node.failed(A);
@@ -730,7 +730,7 @@ node.incomming_message(O,A) := ~node.failed(A);
 
 \noindent Modeling stopping failure before or after any of the steps could therefore be modeled by correctly setting $failed(N)$. Adding the following lines before and after \textit{step1} would do the trick:
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 node.failing_now(N) := *;
 assume node.failing_now(N) -> ~node.failed(N);
@@ -750,7 +750,7 @@ cases where a node that already failed was chosen to fail again, as a node can o
 
 However, this specification omits the possibility of node failure during message sending. Step 1 is modeled using statements that alter the system state as a whole. Expressing non-deterministic failure of individual nodes within these statements is inconvenient. The author therefore decided to simulate the behaviour of a node that failed during message sending in a separate piece of code independent of the logic in \textit{step1}. Consider the following snippet.
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 node.incomming_message_failing(N,M) := *;
 node.incomming_message(N,M) :=
@@ -768,7 +768,7 @@ Line 2 updates the \textit{incomming\_message} relation. If node $M$ failed duri
 \subsubsection{Combination of the two}
 Combining the two principles in a single action gives the following \textit{simulate\_failure} action. It is designed to be called once per round between \textit{step1} and \textit{step2}. It simulates failure before, during and after \textit{step1}. As failure before \textit{step2} is the same as failure after \textit{step1} and failure after \textit{step2} is equivalent to failure before \textit{step1} in the following round, it satisfies all criteria of Lynch's \cite{refNancy} stopping failure model.
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
   action simulate_failure = {
     node.failed_during_round(N) := *;
@@ -799,7 +799,7 @@ Now that the system has been modeled, the next step of verifying correctness wit
 \subsection{Agreement}
 \textit{Agreement} states that no two correct process decide on different values. It can be described as follows.
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 invariant (~node.failed(A) & ~node.failed(B)) ->
             (node.decision(A,V) = node.decision(B,V))
@@ -808,7 +808,7 @@ invariant (~node.failed(A) & ~node.failed(B)) ->
 
 Since the presented specification models deciding via a relation, it is theoretically possible for a node to decide on multiple values. To check against this possibility we demand every node may decide on at most one value.
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 invariant node.decision(N,V) -> (~exists O . node.decision(N,O) & O~=V)
 \end{lstlisting}
@@ -817,7 +817,7 @@ invariant node.decision(N,V) -> (~exists O . node.decision(N,O) & O~=V)
 \subsection{Validity}
 \textit{Validity} states: If all processes start with the same initial value v, then v is the only possible decision value.
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 invariant (exists N,M . node.val(N) ~= node.val(M)) |
           (system.decision_round ->
@@ -828,7 +828,7 @@ invariant (exists N,M . node.val(N) ~= node.val(M)) |
 \subsection{Termination}
 \textit{Termination} states, that all non-faulty processes eventually decide.
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 invariant system.decision_round <->
             (forall N . (~node.failed(N) ->
@@ -853,7 +853,7 @@ in its $w$. The user must now realise, that this is an unreachable state, and ex
 up with an invariant.
 
 The invariant excluding the unreachable state says, that the initial value of a node is always in its $w$:
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 # initial value is in W
 invariant node.w(N, node.val(N))
@@ -861,7 +861,7 @@ invariant node.w(N, node.val(N))
 \end{mdframed}
 
 The method for finding the remaining invariants is identical: Execute $ivy\_check$ $\rightarrow$ examine CTI $\rightarrow$ design invariant $\rightarrow$ execute $ivy\_check$. The following snippets presents the necessary invariants for induction annotated with comments.
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 # the global default is the one the nodes know
 invariant node.default(N) = node.def
@@ -881,7 +881,7 @@ invariant system.clean_round_occured ->
 Since it is also required that the \textit{framework} behaves correctly it makes sense to include some
 correctness conditions specifically aimed at the system.
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 ####### system correctness checks #######
 
@@ -915,7 +915,7 @@ the relatively complicated quantifier-logic in assignments that update the globa
 
 Another threat is posed by $assume$ statements. The author of this paper originally modeled the line
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 node.w(N,V) := (node.w(N,V) |
                (~node.failed(N) &
@@ -924,9 +924,9 @@ node.w(N,V) := (node.w(N,V) |
 \end{lstlisting}
 \end{mdframed}
 
-as
+\noindent as
 
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 node.tmp_w(A,V) := node.w(A V);
 node.w(A,V) := *;
@@ -942,7 +942,7 @@ Furthermore, it has already been shown, that the lack of easy iteration over typ
 
 
 However, as has been pointed out, it is not just the algorithm that must be correctly specified, but the underlying \textit{framework} is equally important to get right. In the presented specification it is possible to remove the \textit{simulate\_failure} action and still receive a positive check from the IVy system. This is unsurprising, as we do not have any mechanism in place that checks that the system correctly models the possibility for node failure. E.g. to check that the simulate failure action allows a node to fail and send a message only to a subset of other nodes one can purposefully insert an assertion that only fails when the desired behaviour is possible, e.g. insert
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 ensure ~(node.failed(N) &
         (exists J . ~incoming_message(J,N) &
