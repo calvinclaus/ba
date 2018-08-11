@@ -118,9 +118,9 @@
   This paper does not aim to be a comprehensive documentation or quantitatively compare IVy's effectiveness to other verification tools.
 
 \section{IVy}
-IVy is a system designed to verify correctness of infinite-sate systems using the aforementioned deductive approach. It takes as input a specification of an algorithm operating on system-state  and a set of invariants. It proofs the inductiveness of the invariants in respect to the algorithm, or displays a counterexample to induction. If the set of invariants entails the desired properties of the algorithm, and Ivy proved induction, then it was proven that the algorithm is \textit{correct}.
+IVy is a system designed to verify correctness of infinite-sate systems using the aforementioned deductive approach. It takes as input a specification of an algorithm operating on system-state  and a set of invariants. It proves the inductiveness of the invariants in respect to the algorithm, or displays a counterexample to induction. If the set of invariants entails the desired properties of the algorithm, and Ivy proved induction, then it was proven that the algorithm is \textit{correct}.
 
-In Ivy, the entity ``calling'' the algorithm in different state configurations is called the ``environment''. The environment conceptually represents the final users of the algorithm. An algorithm or protocol is \textit{correct} or \textit{safe} if it cannot be called by the environment in a state configuration that causes some pre-defined properties (assertions, invariants) not to be satisfied. IVy supports verification of systems that have multiple methods (\textit{actions}) exported to the environment. For example to verify servers that specify connection and disconnection algorithms. This can be thought of as proofing inductiveness of two independent algorithms with respect to the same invariants and system-state.
+In Ivy, the entity ``calling'' the algorithm in different state configurations is called the ``environment''. The environment conceptually represents the final users of the algorithm. An algorithm or protocol is \textit{correct} or \textit{safe} if it cannot be called by the environment in a state configuration that causes some pre-defined properties (assertions, invariants) not to be satisfied. IVy supports verification of systems that have multiple methods (\textit{actions}) exported to the environment. For example to verify servers that specify connection and disconnection algorithms. This can be thought of as proving inductiveness of two independent algorithms with respect to the same invariants and system-state.
 
 \subsection{How IVy is used}
 
@@ -164,7 +164,7 @@ the rest of the work presented in this paper. This section oversimplifies and do
 
 \subsubsection{Types and declarations}
 In IVy one mainly uses \textit{uninterpreted} types. \textit{Uninterpreted} means that the type is an arbitrary set of values with at least one element.
-The cardinality of this set is \textit{parameterized}, meaning IVy proofs correctness for an arbitrary amount of values of an \textit{uninterpreted} type.
+The cardinality of this set is \textit{parameterized}, meaning IVy proves correctness for an arbitrary amount of values of an \textit{uninterpreted} type.
 The number of values of a type that are generated to construct a counter example to induction (CTI) is entirely up to IVy. No instances of these types are manually instantiated.
 This is useful for declaring types such as \textit{node}, \textit{process} or \textit{value} in a system.
 
@@ -286,7 +286,7 @@ by assuming it cannot happen. To give an extreme example, putting $assume\ false
 
 
 \subsubsection{Invariants}
-To specify the properties we want to proof about our algorithm we encode them in special assertions called \textit{invariants}:
+To specify the properties we want to prove about our algorithm we encode them in special assertions called \textit{invariants}:
 
 \begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
@@ -359,7 +359,7 @@ The problem \textit{Floodset} solves is as follows: An arbitrary number of nodes
   \item \textbf{Termination}: All nonfaulty processes eventually decide.
 \end{itemize}
 
-We refer to these condition as ``correctness conditions'', as we say the algorithm is ``correct'' if we can proof it satisfies these conditions.  \textit{Floodset} solves the described problem by defining $msgs$ and $trans$ functions for nodes in the network such that the conditions are satisfied.
+We refer to these condition as ``correctness conditions'', as we say the algorithm is ``correct'' if we can prove it satisfies these conditions.  \textit{Floodset} solves the described problem by defining $msgs$ and $trans$ functions for nodes in the network such that the conditions are satisfied.
 
 \textbf{Informal explanation of \textit{Floodset}}: Processes hold a set $W$ as one of their state components which holds the subset of values of $V$ that the process has seen. Every node's initial $W$ holds only its initial value.  In Step 1 of every round nodes broadcast their $W$. In Step 2 all $v \in V$ that \textit{(a)} are sent to a process and \textit{(b)} the process does not yet hold in its $W$ are added to its $W$. In the $f+1$th round a node decides: If $W$ is a singleton set then it decides on the unique element of $W$, otherwise it decides on the default value $v_0$.  \textit{Deciding} is modeled by nodes setting a special \textit{decision} state component to a value in $V$.
 
@@ -437,7 +437,7 @@ This work now presents a way to translate Lynch's \textit{framework} and the \te
 \section{Specification}
 To summarize: we have a parameterized system with $n$ process and $f$ number of faults. We want to show \textit{Floodset} is correct regardless of the parameters.
 It is trivial to verify for a small number of $n,\ f$, but the question is ``does \textit{Floodset} work for any assignment of $n,\ f,\ n < f$''.
-To answer this question the algorithm was encoded in the IVy language and then inductive invariants were constructed to proof correctness.
+To answer this question the algorithm was encoded in the IVy language and then inductive invariants were constructed to prove correctness.
 
 
 \subsection{Modeling strategy}
@@ -905,7 +905,7 @@ invariant system.decision_round -> system.clean_round_occured
 \section{Evaluation}
 
 
-How viable is IVy as a tool for algorithm designers to proof correctness
+How viable is IVy as a tool for algorithm designers to prove correctness
 of their work?  The goal, when turning to a tool like IVy, is certainty of
 correctness. However, absolute certainty is never really achieved.
 One can not trivially determine, that the specification in the IVy language is logically equivalent to the actual algorithm.
@@ -970,7 +970,7 @@ This paper has presented the Ivy system and important Ivy language features. It 
 as part of a three step process of algorithm verification.
 It explained that its usage requires a readiness to let go of procedural programming paradigms
 in favor of the logic oriented language. It gave an explanation of induction and inductive invariants,
-explaining what they are, how they are used by IVy to proof correctness and how they can be found.
+explaining what they are, how they are used by IVy to prove correctness and how they can be found.
 It presented some of the systems capabilities to verify distributed algorithms by example.
 
 It pointed out some limitations. One being that it is hard to know an algorithm was correctly specified in IVy. This is due to
