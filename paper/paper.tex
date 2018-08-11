@@ -604,6 +604,30 @@ object system = {
 \end{lstlisting}
 \end{mdframed}
 
+\subsection{Initialisation}
+
+First, we describe the initial system state in a special \textit{after init} action. When
+proving correctness, IVy requires the initialisation to entail the invariants. All relations and functions
+that are not assigned are set non-deterministically by the environment. E.g. $node.val(N)$ is
+treated as a parameter the environment sets.
+
+\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{lstlisting}
+after init {
+  def := *;
+  default(N) := def;
+  w(N, V) := V=node.val(N);
+  incomming_message(A, B) := false;
+  decision(N, V) := false;
+  clean_round_occured := false;
+  decision_round := false;
+  node.failed_before_round(N) := false;
+  node.failed(N) := false;
+  node.has_single_value(N) := false;
+}
+\end{lstlisting}
+\end{mdframed}
+
 \subsection{Rounds}
 
 \noindent A round in the specification is defined as follows:
@@ -767,29 +791,6 @@ Lines 2 to 5 resemble the snippet of section \textit{vii.1}. In line 2 we choose
 
 Line 7 to 12 is equivalent to the snippet of \textit{vii.2} and simulates the message sending behaviour of failing nodes.
 
-\subsection{Initialisation}
-
-Finally, we describe the initial system state in a special \textit{after init} action. When
-proving correctness, IVy requires the initialisation to entail the invariants. All relations and functions
-that are not assigned are set non-deterministically by the environment. E.g. $node.val(N)$ is
-treated as a parameter the environment sets.
-
-\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
-\begin{lstlisting}
-after init {
-  def := *;
-  default(N) := def;
-  w(N, V) := V=node.val(N);
-  incomming_message(A, B) := false;
-  decision(N, V) := false;
-  clean_round_occured := false;
-  decision_round := false;
-  node.failed_before_round(N) := false;
-  node.failed(N) := false;
-  node.has_single_value(N) := false;
-}
-\end{lstlisting}
-\end{mdframed}
 
 \section{Verification}
 
