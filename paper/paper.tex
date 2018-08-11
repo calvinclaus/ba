@@ -10,7 +10,10 @@
 \usepackage{listings}
 
 \lstset{
-  xleftmargin=0em,
+  xleftmargin=1em,
+  numbers=left,
+  firstnumber=1,
+  numberfirstline=true
 }
 \usepackage{xcolor} %custom colours
 \usepackage{mdframed} %nice frames
@@ -601,6 +604,7 @@ object system = {
 \end{lstlisting}
 \end{mdframed}
 
+\subsection{Rounds}
 
 \noindent A round in the specification is defined as follows:
 \begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
@@ -621,15 +625,15 @@ export round;
 \end{lstlisting}
 \end{mdframed}
 
+\noindent \textit{round} is the only exported action. It specifies the basic structure of Lynch's \textit{framework}.
 \noindent Line 2 makes it illegal for the environment to call \textit{round} if decisions already occurred.
 \noindent Line 3 does some bookkeeping.
 \textit{call step1} models the communication step. \textit{simulate\_failure} simulates failure before, during
-or after \textit{step1}. After \textit{decision\_round} is set, \textit{call step2} is
-executed to model the state transition of the nodes.
+and after \textit{step1}. After \textit{decision\_round} is set, \textit{call step2} is executed to model the state transition of the nodes.
 
 
 \subsection{Step 1 - Message sending}
-The contents of a nodes message is modeled via the relation $message(N:node,V:value)$. Where
+The contents of a node's message is modeled via the relation $message(N:node,V:value)$. Where
 $message(1,0) = true; message(1,1) = true;$ means node $1$ includes in its message the values $0$ and $1$.
 Since a node sends the same message to all nodes, for any given round, we don't need to include the
 recipient in the relation.
@@ -650,8 +654,8 @@ action step1 = {
 
 \subsection{Step 2 - State transition}
 
-Line 2 of the \textit{step2} action adds to $w$ of node $N$ all values $V$ for which a node $J$ exists that has sent a message to $N$ that contains $J$.
-The conditional statement in Line 4 corresponds to $if\ rounds = f+1$ in the original algorithm. Nodes with a single value in $w$ decide on that value, otherwise
+Line 2 in the \textit{step2} action adds to $w$ of node $N$ all values $V$ for which a node $J$ exists that has sent a message to $N$ that contains $J$.
+The conditional statement in Line 4 corresponds to the \textit{decision condition} ($if\ rounds = f+1$) in the original algorithm. Nodes with a single value in $w$ decide on that value, otherwise
 they decide on the default value.
 Finally, for good measure, $incomming\_message$ and $message$ are reset, but this is not necessary for the proof.
 
@@ -686,38 +690,82 @@ action step2 = {
 
 \subsection{Failure simulation}
 
-The \textit{simulate\_failure} action simulates the failure model described by Lynch.
-It is called after \textit{step1} and illustrates sophisticated usage of $assume$.
 
-In line 2 we choose a random number of nodes to fail. The \textit{assume} in line 3 then excludes all
-cases where a node that has already failed was chosen to fail in this round. (A node can only fail once).
+This section shows how the stopping failure model described by Lynch \cite{refNancy} and explained in \textit{section III ii.} was modeled in Ivy.
 
-Line 4 prepares for each node $M$ a non-deterministically chosen set of nodes that it sends a message to, \textit{incomming\_message\_failing}.
-Line 6 updates the \textit{incomming\_message} relation. If node $M$ failed during this round, the set of nodes
- $M$ sends messages to is changed to the values of \textit{incomming\_message\_failing}, otherwise it remains the same.
+To recap, a process may fail before or after performing some instance of Step 1 or Step 2 as well as in the middle of performing Step 1.  The presented code for actions \textit{step1} and \textit{step2} already correctly considers the behaviour of nodes that failed before the actions. E.g. \textit{step1} only allows nodes that have not failed to send messages.
+\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{lstlisting}
+. . .
+node.incomming_message(O,A) := ~node.failed(A);
+. . .
+\end{lstlisting}
+\end{mdframed}
 
- After the nodes that \textit{failed\_during\_round} are set to \textit{failed} in line 12, line 13 assumes
- the condition $f<n$. This excludes the cases where all nodes failed.
+\subsubsection{Failure before and after rounds}
 
+\noindent Modeling stopping failure before or after any of the steps could therefore be modeled by correctly setting $failed(N)$. Adding the following lines before and after \textit{step1} would do the trick:
+
+\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{lstlisting}
+node.failing_now(N) := *;
+assume node.failing_now(N) -> ~node.failed(N);
+node.failed_during_round(N) :=
+  (node.failed_now(N) | node.failed_during_round(N))
+node.failed(N) := (node.failed(N) | node.failed_during_round(N));
+assume exists N . ~node.failed(N);
+\end{lstlisting}
+\end{mdframed}
+
+\noindent This snippet is presented only to convey some intuition about the final modeling decision and is not used in the final specification
+
+Line 1 non-deterministically chooses nodes to fail. The \textit{assume} in line 2 excludes all
+cases where a node that already failed was chosen to fail again, as a node can only fail once. Line 3 keeps track of the nodes that failed during the current round to enable \textit{clean\_round\_occured} to be set appropriately later. Line 5 adds the newly failed nodes to the set of failed nodes. Line 6 disallows the possibility that all nodes are chosen to fail and therefore enforces $f < n$.
+
+\subsubsection{Failure during rounds}
+
+However, this specification omits the possibility of node failure during message sending. Step 1 is modeled using statements that alter the system state as a whole. Expressing non-deterministic failure of individual nodes within these statements is inconvenient. The author therefore decided to simulate the behaviour of a node that failed during message sending in a separate piece of code independent of the logic in \textit{step1}. Consider the following snippet.
+
+\begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{lstlisting}
+node.incomming_message_failing(N,M) := *;
+node.incomming_message(N,M) :=
+  (node.failed_during_round(M) &
+    node.incomming_message_failing(N,M)) |
+  (~node.failed_during_round(M) &
+    node.incomming_message(N,M));
+\end{lstlisting}
+\end{mdframed}
+
+Line 1 prepares for each node $M$ a non-deterministically chosen set of nodes that it sends a message to. This set is represented by the relation \textit{incomming\_message\_failing}. This relation can be thought of as the set of nodes $M$ will send a message to if $M$ fails.
+Line 2 updates the \textit{incomming\_message} relation. If node $M$ failed during this round, the set of nodes
+ $M$ sends messages to is changed to the values of \textit{incomming\_message\_failing}, otherwise it remains the same. It is important to point out that this approach correctly simulates the fact that nodes are not thought of as sending messages sequentially but in non-deterministic order. The specification makes no assumptions about an order of message sending. Furthermore, for fixed $m$, \textit{incomming\_message\_failing(N,m)} may still be $true$ for all N. The specification therefore includes the possibility of a node failing after it sent all its messages successfully.
+
+\subsubsection{Combination of the two}
+Combining the two principles in a single action gives the following \textit{simulate\_failure} action. It is designed to be called once per round between \textit{step1} and \textit{step2}. It simulates failure before, during and after \textit{step1}. As failure before \textit{step2} is the same as failure after \textit{step1} and failure after \textit{step2} is equivalent to failure before \textit{step1} in the following round, it satisfies all criteria of Lynch's \cite{refNancy} stopping failure model.
 
 \begin{mdframed}[backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
   action simulate_failure = {
     node.failed_during_round(N) := *;
     assume node.failed_during_round(N) -> ~node.failed(N);
-    node.incomming_message_failing(N,M) := *;
+    node.failed(N) := (node.failed(N) | node.failed_during_round(N));
+    assume exists N . ~node.failed(N);
 
+    node.incomming_message_failing(N,M) := *;
     node.incomming_message(N,M) :=
       (node.failed_during_round(M) &
         node.incomming_message_failing(N,M)) |
       (~node.failed_during_round(M) &
         node.incomming_message(N,M));
 
-    node.failed(N) := (node.failed(N) | node.failed_during_round(N));
-    assume exists N . ~node.failed(N);
   }
 \end{lstlisting}
 \end{mdframed}
+
+Lines 2 to 5 resemble the snippet of section \textit{vii.1}. In line 2 we choose a random number of nodes to fail. The \textit{assume} in line 3 then excludes all cases where a node that already failed was chosen to fail again. Line 4 adds the newly failed nodes to the set of failed nodes. Line 5 enforces $f < n$. Since this action is only called once per round we do not need an extra relation \textit{failing\_now} presented in \textit{vii.1}.
+
+Line 7 to 12 is equivalent to the snippet of \textit{vii.2} and simulates the message sending behaviour of failing nodes.
 
 \subsection{Initialisation}
 
