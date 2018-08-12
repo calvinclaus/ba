@@ -446,7 +446,7 @@ This section walks through the specification step by step. It illustrates the pa
 
 \subsubsection{Modularity}
 When verifying an algorithm like \textit{Floodset} in IVy, an algorithm designer would prefer to translate their original algorithm to the IVy language in as close to a one-to-one fashion as possible. However, this is not quite convenient for \textit{Floodset} and the \textit{framework} it operates in.
-To separate system logic and node logic one would have to rely heavily on iterations. E.g. for \textit{Step 1} the system would iterate over all nodes and let each node take care of sending it's own message.
+To separate system logic and node logic one would have to rely heavily on iterations. E.g. for \textit{Step 1} the system would iterate over all nodes and let each node take care of sending its own message.
 
 \begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
