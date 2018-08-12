@@ -146,7 +146,7 @@ keyword here. An invariant is \textit{inductive} iff the following three propert
   \item safety: for any program state that satisfies the invariant - regardless of whether this state is reachable - no \textit{exported} action can cause an assertion failure starting in that state
   \item consecution: for any program state that satisfies the invariant - regardless of whether this state is reachable - after executing any \textit{exported} action, the invariant remains satisfied
 \end{enumerate}
-As a user without any experience in automatic verification, \textit{inductive} invariants are a difficult concept.
+To a user without any experience in automatic verification, \textit{inductive} invariants are a difficult concept.
 IVy does not consider the reachability of a system state.  As long as the state is in compliance with the invariants it is assumed to be reachable.
 Thus, when IVy generates counterexamples that are clearly not reachable, e.g. negative values for counters that are set to zero at initialization, the solution is to specify an invariant that excludes these state, e.g. $invariant\ counter \geq 0$.
 
