@@ -512,7 +512,7 @@ For this reason the following specification of \textit{Floodset} uses a non-modu
 
 
 \subsubsection{Cardinality relationships}
-There is no cardinality operator in IVy. In set notation we would write something like $|\{n|node(n) \land failed(n)\}|$ to count the number of failed nodes in a system. When programming in a procedural language one would use a loop for this task but, as has been explained in the previous section, loops are somewhat problematic in IVy. The author couldn't find a way to specify an inductive loop invariant for a loop counting the number of failed nodes without a cardinality operator at hand. This means that alternative encodings for the assumption $f<n$ and the \textit{decision condition} ($if\ rounds = f+1$) must be found.
+There is no cardinality operator in IVy. In set notation we would write something like $|\{n|node(n) \land failed(n)\}|$ to count the number of failed nodes in a system. When programming in a procedural language one would use a loop for this task but, as has been explained in the previous section, loops are somewhat problematic in IVy. The author could not find a way to specify an inductive loop invariant for a loop counting the number of failed nodes without a cardinality operator at hand. This means that alternative encodings for the assumption $f<n$ and the \textit{decision condition} ($if\ rounds = f+1$) must be found.
 
 The assumption $f<n$, ``number of failed nodes is bounded to an amount smaller than the number of total nodes'', can alternatively be expressed via $\exists n\ \neg failed(N)$. This is because the existence of a functioning node implies that the number of failed nodes $f$ is smaller than $n$.
 
