@@ -268,7 +268,7 @@ However, they are different semantically: \textit{require} assigns blame to the 
 is a condition that the action itself must guarantee. \textit{Require} is especially relevant to restrict
 the environment in the way it can call an action.
 
-\textit{Assume} is used to exclude the possibility of something happening.  This is mostly useful in combination with non-deterministic assignments that one wants to restrict. The following action chooses a random node to assign to \textit{y}, but will not allow control to pass if the chosen node has failed. Therefore the actions will choose a random non-failed node to send a message to x.  If there is no node that hasn't failed, this action cannot terminate.
+\textit{Assume} is used to exclude the possibility of something happening.  This is mostly useful in combination with non-deterministic assignments that one wants to restrict. The following action chooses a random node to assign to \textit{y}, but will not allow control to pass if the chosen node has failed. Therefore the actions will choose a random non-failed node to send a message to x.  If there is no node that has not failed, this action cannot terminate.
 
 \begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
@@ -461,7 +461,7 @@ action round = {
 }
 action send_messages(n:node.t) = {
   node.message(n,V) := node.w(n,V);
-  node.incomming_message(O,n) := true;
+  node.incoming_message(O,n) := true;
 }
 
 export round
@@ -474,7 +474,7 @@ export round
 \begin{lstlisting}
 . . .
 line 3: message := *;
-line 3: incomming_message := *;
+line 3: incoming_message := *;
 . . .
 \end{lstlisting}
 \end{mdframed}
@@ -484,7 +484,7 @@ IVy non-deterministically assigns to all relations involved in the loop, instead
 \begin{lstlisting}
   while ~iter.is_end
   invariant node.message(N,V) = node.w(N,V)
-  invariant N <= iter.val -> incomming_message(O,N)
+  invariant N <= iter.val -> incoming_message(O,N)
   {
     . . .
   }
@@ -496,11 +496,11 @@ These invariants must hold before the loop and after every iteration. The follow
 \begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 assert message(N,V) = w(N,V)
-assert N:t <= t.iter.val(loc:iter) -> incomming_message(O,N)
-incomming_message := *
+assert N:t <= t.iter.val(loc:iter) -> incoming_message(O,N)
+incoming_message := *
 message := *
 assume message(N,V) = w(N,V)
-assume N:t <= t.iter.val(loc:iter) -> incomming_message(O,N)
+assume N:t <= t.iter.val(loc:iter) -> incoming_message(O,N)
 \end{lstlisting}
 \end{mdframed}
 
@@ -574,9 +574,9 @@ object node = {
   # message(n,v) denotes whether v is broadcast by n
   relation message(N:node, V:value)
 
-  # incomming_message(n,o) denotes whether node n received a message
+  # incoming_message(n,o) denotes whether node n received a message
   # from node o
-  relation incomming_message(SELF:node, OTHER:node)
+  relation incoming_message(SELF:node, OTHER:node)
 
 # internal helpers
   # true if a node had already failed before this round
@@ -589,7 +589,7 @@ object node = {
   relation has_single_value(N:node)
 
   # helper to simulate non-determinstic message sending
-  relation incomming_message_failing(SELF:node, OTHER:node)
+  relation incoming_message_failing(SELF:node, OTHER:node)
 
 
 }
@@ -617,7 +617,7 @@ after init {
   def := *;
   default(N) := def;
   w(N, V) := V=node.val(N);
-  incomming_message(A, B) := false;
+  incoming_message(A, B) := false;
   decision(N, V) := false;
   clean_round_occured := false;
   decision_round := false;
@@ -659,19 +659,19 @@ and after \textit{step1}. After \textit{decision\_round} is set, \textit{call st
 \subsection{Step 1 - Message sending}
 The contents of a node's message is modeled via the relation $message(N:node,V:value)$. Where
 $message(1,0) = true; message(1,1) = true;$ means node $1$ includes in its message the values $0$ and $1$.
-Since a node sends the same message to all nodes, for any given round, we don't need to include the
+Since a node sends the same message to all nodes, for any given round, we do not need to include the
 recipient in the relation.
 
-The actual delivery of a message is modeled via the $incomming\_message(RECIPIENT:node,SENDER:node)$ relation. Where $incoming\_message(0,1) = true; incoming\_message(0,2) = true;$ means that node $0$ receives the messages from node $1$ and node $2$.
+The actual delivery of a message is modeled via the $incoming\_message(RECIPIENT:node,SENDER:node)$ relation. Where $incoming\_message(0,1) = true; incoming\_message(0,2) = true;$ means that node $0$ receives the messages from node $1$ and node $2$.
 
 These relations allow us to use IVy's assignments to easily model \textit{Step 1} in a round of \textit{Floodset}.
-Line 2 assigns for all nodes $A$ and values $V$ to $message(A,V)$ the boolean value of $node.w(A,V) \land \neg failed(A)$. In other words, every node that hasn't failed prepares a message with all values in its $w$. Line 3 states that all nodes that haven't failed send messages to all other nodes.
+Line 2 assigns for all nodes $A$ and values $V$ to $message(A,V)$ the boolean value of $node.w(A,V) \land \neg failed(A)$. In other words, every node that has not failed prepares a message with all values in its $w$. Line 3 states that all nodes that haven't failed send messages to all other nodes.
 
 \begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 action step1 = {
   node.message(A,V) := node.w(A,V) & ~node.failed(A);
-  node.incomming_message(O,A) := ~node.failed(A);
+  node.incoming_message(O,A) := ~node.failed(A);
 }
 \end{lstlisting}
 \end{mdframed}
@@ -681,14 +681,14 @@ action step1 = {
 Line 2 in the \textit{step2} action adds to $w$ of node $N$ all values $V$ for which a node $J$ exists that has sent a message to $N$ that contains $J$.
 The conditional statement in Line 4 corresponds to the \textit{decision condition} ($if\ rounds = f+1$) in the original algorithm. Nodes with a single value in $w$ decide on that value, otherwise
 they decide on the default value.
-Finally, for good measure, $incomming\_message$ and $message$ are reset, but this is not necessary for the proof.
+Finally, for good measure, $incoming\_message$ and $message$ are reset, but this is not necessary for the proof.
 
 \begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 action step2 = {
   node.w(N,V) := (node.w(N,V) |
                  (~node.failed(N) &
-                  exists J . (node.incomming_message(N,J) &
+                  exists J . (node.incoming_message(N,J) &
                                node.message(J,V))));
 
   if decision_round {
@@ -706,7 +706,7 @@ action step2 = {
 
   };
 
-  node.incomming_message(A,B) := false;
+  node.incoming_message(A,B) := false;
   node.message(A,V) := false;
 }
 \end{lstlisting}
@@ -721,7 +721,7 @@ To recap, a process may fail before or after performing some instance of Step 1 
 \begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
 . . .
-node.incomming_message(O,A) := ~node.failed(A);
+node.incoming_message(O,A) := ~node.failed(A);
 . . .
 \end{lstlisting}
 \end{mdframed}
@@ -752,18 +752,18 @@ However, this specification omits the possibility of node failure during message
 
 \begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
-node.incomming_message_failing(N,M) := *;
-node.incomming_message(N,M) :=
+node.incoming_message_failing(N,M) := *;
+node.incoming_message(N,M) :=
   (node.failed_during_round(M) &
-    node.incomming_message_failing(N,M)) |
+    node.incoming_message_failing(N,M)) |
   (~node.failed_during_round(M) &
-    node.incomming_message(N,M));
+    node.incoming_message(N,M));
 \end{lstlisting}
 \end{mdframed}
 
-Line 1 prepares for each node $M$ a non-deterministically chosen set of nodes that it sends a message to. This set is represented by the relation \textit{incomming\_message\_failing}. This relation can be thought of as the set of nodes $M$ will send a message to if $M$ fails.
-Line 2 updates the \textit{incomming\_message} relation. If node $M$ failed during this round, the set of nodes
- $M$ sends messages to is changed to the values of \textit{incomming\_message\_failing}, otherwise it remains the same. It is important to point out that this approach correctly simulates the fact that nodes are not thought of as sending messages sequentially but in non-deterministic order. The specification makes no assumptions about an order of message sending. Furthermore, for fixed $m$, \textit{incomming\_message\_failing(N,m)} may still be $true$ for all N. The specification therefore includes the possibility of a node failing after it sent all its messages successfully.
+Line 1 prepares for each node $M$ a non-deterministically chosen set of nodes that it sends a message to. This set is represented by the relation \textit{incoming\_message\_failing}. This relation can be thought of as the set of nodes $M$ will send a message to if $M$ fails.
+Line 2 updates the \textit{incoming\_message} relation. If node $M$ failed during this round, the set of nodes
+ $M$ sends messages to is changed to the values of \textit{incoming\_message\_failing}, otherwise it remains the same. It is important to point out that this approach correctly simulates the fact that nodes are not thought of as sending messages sequentially but in non-deterministic order. The specification makes no assumptions about an order of message sending. Furthermore, for fixed $m$, \textit{incoming\_message\_failing(N,m)} may still be $true$ for all N. The specification therefore includes the possibility of a node failing after it sent all its messages successfully.
 
 \subsubsection{Combination of the two}
 Combining the two principles in a single action gives the following \textit{simulate\_failure} action. It is designed to be called once per round between \textit{step1} and \textit{step2}. It simulates failure before, during and after \textit{step1}. As failure before \textit{step2} is the same as failure after \textit{step1} and failure after \textit{step2} is equivalent to failure before \textit{step1} in the following round, it satisfies all criteria of Lynch's \cite{refNancy} stopping failure model.
@@ -776,12 +776,12 @@ Combining the two principles in a single action gives the following \textit{simu
     node.failed(N) := (node.failed(N) | node.failed_during_round(N));
     assume exists N . ~node.failed(N);
 
-    node.incomming_message_failing(N,M) := *;
-    node.incomming_message(N,M) :=
+    node.incoming_message_failing(N,M) := *;
+    node.incoming_message(N,M) :=
       (node.failed_during_round(M) &
-        node.incomming_message_failing(N,M)) |
+        node.incoming_message_failing(N,M)) |
       (~node.failed_during_round(M) &
-        node.incomming_message(N,M));
+        node.incoming_message(N,M));
 
   }
 \end{lstlisting}
@@ -898,7 +898,7 @@ invariant exists N . ~node.failed(N)
 invariant node.failed_before_round(N) -> node.failed(N)
 
 # 'after' a node has failed it will not send anything
-invariant node.failed_before_round(N) -> ~node.incomming_message(M, N)
+invariant node.failed_before_round(N) -> ~node.incoming_message(M, N)
 
 # If the decision round occured, a clean round must have occured
 invariant system.decision_round -> system.clean_round_occured
@@ -925,7 +925,7 @@ The IVy language is structurally unlike classical procedural languages. This mak
 \begin{lstlisting}
 node.w(N,V) := (node.w(N,V) |
                (~node.failed(N) &
-                exists J . (node.incomming_message(N,J) &
+                exists J . (node.incoming_message(N,J) &
                              node.message(J,V))));
 \end{lstlisting}
 \end{mdframed}
@@ -956,7 +956,7 @@ To give a practical example, the author of this paper originally modeled the lin
 \begin{lstlisting}
 node.w(N,V) := (node.w(N,V) |
                (~node.failed(N) &
-                exists J . (node.incomming_message(N,J) &
+                exists J . (node.incoming_message(N,J) &
                              node.message(J,V))));
 \end{lstlisting}
 \end{mdframed}
@@ -968,7 +968,7 @@ node.w(N,V) := (node.w(N,V) |
 node.tmp_w(A,V) := node.w(A V);
 node.w(A,V) := *;
 assume node.w(A,V) <-> (node.tmp_w(A,V) |
-                        ((node.incomming_message(A,J) &
+                        ((node.incoming_message(A,J) &
                           node.message(J,V))));
 \end{lstlisting}
 \end{mdframed}
@@ -994,7 +994,7 @@ One may use the following approach to verify that a particular system state is r
 \begin{lstlisting}
 assert ~(exists N . node.failed(N) &
         (exists J . ~incoming_message(J,N) &
-          exists K . incomming_message(K,N) & J~=N & K~=J & N~=K))
+          exists K . incoming_message(K,N) & J~=N & K~=J & N~=K))
 \end{lstlisting}
 \end{mdframed}
 after the \textit{simulate\_failure} action. The negated part, $\gamma$, specifies that there exists a node $N$, that failed and failed to deliver a message to $J$ while successfully delivering a message to $K$, with $N,J,K$ distinct. By negating $\gamma$, we force Ivy to construct a counterexample such that $\gamma$ is satisfied. If IVy does not find a counterexample to this assertion, it means that $\gamma$ cannot occur. In this particular case, that would mean the specification does not allow partial message delivery. The specification would therefore be erroneous. One has to finally remove the failing assertion to allow Ivy to prove induction again.
