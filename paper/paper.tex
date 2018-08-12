@@ -118,7 +118,7 @@
   This paper does not aim to be a comprehensive documentation or quantitatively compare IVy's effectiveness to other verification tools.
 
 \section{IVy}
-IVy is a system designed to verify correctness of infinite-sate systems using the aforementioned deductive approach. It takes as input a specification of an algorithm operating on system-state  and a set of invariants. It proves the inductiveness of the invariants in respect to the algorithm, or displays a counterexample to induction. If the set of invariants entails the desired properties of the algorithm, and Ivy proved induction, then it was proven that the algorithm is \textit{correct}.
+IVy is a system designed to verify correctness of infinite-sate systems using the aforementioned deductive approach. In a nutshell, it takes as input the specification of an algorithm, which may mutate state, and a set of invariants. It proves the inductiveness of the invariants in respect to the algorithm, or displays a counterexample to induction. If the set of invariants entails the desired properties of the algorithm, and Ivy proved induction, then it was proven that the algorithm is \textit{correct}.
 
 In Ivy, the entity ``calling'' the algorithm in different state configurations is called the ``environment''. The environment conceptually represents the final users of the algorithm. An algorithm or protocol is \textit{correct} or \textit{safe} if it cannot be called by the environment in a state configuration that causes some pre-defined properties (assertions, invariants) to be violated. IVy supports verification of systems that have multiple methods (\textit{actions}) exported to the environment. For example to verify servers that specify connection and disconnection algorithms. This can be thought of as proving inductiveness of two independent algorithms with respect to the same invariants and system-state.
 
@@ -302,7 +302,7 @@ First order logic is undecidable in general, but still many interesting properti
 
 For example, Ivy only allows stratified functions. Meaning that a graph, with every type being a node and every function mapping from type $A$ to type $B$ be an edge from $A$ to $B$, has to be cycle free. Thus, there cannot be a function from $X \rightarrow Y$ and from $Y \rightarrow X$ in the same specification.
 
-A detailed discussion about decidability lies outside of the scope of this work and is well documented in \cite{decide}.
+A detailed discussion about decidability lies outside of the scope of this work and is well documented in \cite{decid}.
 
 While a complete understanding of decidability in Ivy is advantageous, to use Ivy successfully it is not strictly necessary. This is because Ivy assists the user and tries to automatically determine if formulas lie outside of the decidable fragment. It warns users about specifications that it estimates are undecidable.  It must be noted that IVy's check is conservative as ``fully unfolding all of the definitions could be exponential''. Ivy may report specifications as undecidable which are in fact decidable. For this reason IVy allows the check to be deactivated. \cite{decid}
 
@@ -514,7 +514,7 @@ For this reason the following specification of \textit{Floodset} uses a non-modu
 \subsubsection{Cardinality relationships}
 There is no cardinality operator in IVy. In set notation we would write something like $|\{n|node(n) \land failed(n)\}|$ to count the number of failed nodes in a system. When programming in a procedural language one would use a loop for this task but, as has been explained in the previous section, loops are somewhat problematic in IVy. The author could not find a way to specify an inductive loop invariant for a loop counting the number of failed nodes without a cardinality operator at hand. This means that alternative encodings for the assumption $f<n$ and the \textit{decision condition} ($if\ rounds = f+1$) must be found.
 
-The assumption $f<n$, ``number of failed nodes is bounded to an amount smaller than the number of total nodes'', can alternatively be expressed via $\exists n\ \neg failed(N)$. This is because the existence of a functioning node implies that the number of failed nodes $f$ is smaller than $n$.
+The assumption $f<n$, ``number of failed nodes is bounded to an amount smaller than the total number of nodes'', can alternatively be expressed via $\exists n\ \neg failed(n)$. This is because the existence of a functioning node implies that the number of failed nodes $f$ is smaller than $n$.
 
 To figure out how to alternatively encode the \textit{decision condition} deep understanding of the algorithm is necessary. One must realise that $rounds = f+1$ entails that a ``clean round'' occurred (see \textit{Lemma 3}). Where ``clean round'' describes ``a round in which no node failed''. The processes are ready to decide after a clean round has occurred. They can decide either immediately, or an arbitrary number of rounds after the clean round. This can be modeled with non-determinism:
 
@@ -658,11 +658,12 @@ and after \textit{step1}. After \textit{decision\_round} is set, \textit{call st
 
 \subsection{Step 1 - Message sending}
 The contents of a node's message is modeled via the relation $message(N:node,V:value)$. Where
-$message(1,0) = true; message(1,1) = true;$ means node $1$ includes in its message the values $0$ and $1$.
+$message(1,0) = true;\ message(1,1) = true;$ means node $1$ includes in its message the values $0$ and $1$.
 Since a node sends the same message to all nodes, for any given round, we do not need to include the
 recipient in the relation.
 
-The actual delivery of a message is modeled via the $incoming\_message(RECIPIENT:node,SENDER:node)$ relation. Where $incoming\_message(0,1) = true; incoming\_message(0,2) = true;$ means that node $0$ receives the messages from node $1$ and node $2$.
+The actual delivery of a message is modeled via the \\
+$incoming\_message(RECIPIENT:node,SENDER:node)$ relation. Where $incoming\_message(0,1) = true;\ incoming\_message(0,2) = true;$ means that node $0$ receives the messages from node $1$ and node $2$.
 
 These relations allow us to use IVy's assignments to easily model \textit{Step 1} in a round of \textit{Floodset}.
 Line 2 assigns for all nodes $A$ and values $V$ to $message(A,V)$ the boolean value of $node.w(A,V) \land \neg failed(A)$. In other words, every node that has not failed prepares a message with all values in its $w$. Line 3 states that all nodes that haven't failed send messages to all other nodes.
@@ -678,9 +679,8 @@ action step1 = {
 
 \subsection{Step 2 - State transition}
 
-Line 2 in the \textit{step2} action adds to $w$ of node $N$ all values $V$ for which a node $J$ exists that has sent a message to $N$ that contains $J$.
-The conditional statement in Line 4 corresponds to the \textit{decision condition} ($if\ rounds = f+1$) in the original algorithm. Nodes with a single value in $w$ decide on that value, otherwise
-they decide on the default value.
+Line 2 in the \textit{step2} action adds to $w$ of node $N$ all values $V$ for which a node $J$ exists that has sent a message to $N$ that contains $V$.
+The conditional statement in Line 7 corresponds to the \textit{decision condition} ($if\ rounds = f+1$) in the original algorithm. Line 9 sets the helper relation $has\_single\_value(N:node)$ that is set to true for $N$ iff it has exactly one value in its $w$. Line 13 specifies that nodes with a single value in $w$ decide on that value, unless they have failed. Line 16 specifies that nodes with multiple values in their $w$ decide on their default value, unless they failed. The disjunction on line 17 with $node . decision (N, node . default (N))$ is necessary so as not to overwrite an already made decision of a node with $w = \{v_0\}$, $v_0$ being the default value.
 Finally, for good measure, $incoming\_message$ and $message$ are reset, but this is not necessary for the proof.
 
 \begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
@@ -761,8 +761,8 @@ node.incoming_message(N,M) :=
 \end{lstlisting}
 \end{mdframed}
 
-Line 1 prepares for each node $M$ a non-deterministically chosen set of nodes that it sends a message to. This set is represented by the relation \textit{incoming\_message\_failing}. This relation can be thought of as the set of nodes $M$ will send a message to if $M$ fails.
-Line 2 updates the \textit{incoming\_message} relation. If node $M$ failed during this round, the set of nodes
+Line 1 prepares for each node $M$ a non-deterministically chosen set of nodes that it sends a message to. This set is represented by the relation \textit{incoming\_message\_failing}. This relation can be thought of as the set of nodes which $M$ will send a message to if $M$ fails.
+Line 2 updates the \textit{incoming\_message} relation. If node $M$ failed during this round, the set of nodes which
  $M$ sends messages to is changed to the values of \textit{incoming\_message\_failing}, otherwise it remains the same. It is important to point out that this approach correctly simulates the fact that nodes are not thought of as sending messages sequentially but in non-deterministic order. The specification makes no assumptions about an order of message sending. Furthermore, for fixed $m$, \textit{incoming\_message\_failing(N,m)} may still be $true$ for all N. The specification therefore includes the possibility of a node failing after it sent all its messages successfully.
 
 \subsubsection{Combination of the two}
@@ -794,7 +794,7 @@ Line 7 to 12 is equivalent to the snippet of \textit{vii.2} and simulates the me
 
 \section{Verification}
 
-Now that the system has been modeled, the next step of verifying correctness with IVy is specifying inductive invariants. The simplest invariants to come up with are those, that describe the correctness of the algorithm at hand. In our case, the correctness is described by the \textit{correctness conditions} in \textit{iii}. These are \textit{agreement}, \textit{validity} and \textit{termination}.
+Now that the system has been modeled, the next step of verifying correctness with IVy is specifying inductive invariants. The simplest invariants to come up with are those, that describe the correctness of the algorithm at hand. In our case, the correctness is described by the \textit{correctness conditions} in \textit{III.iii}. These are \textit{agreement}, \textit{validity} and \textit{termination}.
 
 \subsection{Agreement}
 \textit{Agreement} states that no two correct process decide on different values. It can be described as follows.
@@ -869,10 +869,9 @@ invariant node.default(N) = node.def
 
 # if a value is in a process' W, it must be initial value of
 # some other process (no invented values)
-
 invariant node.w(N, V) -> (exists M . node.val(M)=V)
 
-# lemma 1:
+# lemma 1, explained in III
 invariant system.clean_round_occured ->
             (~node.failed(A) & ~node.failed(B)) ->
               (node.w(A, V) = node.w(B, V)))
@@ -941,10 +940,10 @@ node.w(N,V) := (node.w(N,V) |
 
 This comparison clearly shows the complex structural differences. While the pseudo-code is concerned only with state alteration of a single node, the Ivy language code simultaneously alters the state of all nodes. It uses an existential quantifier nested within a term. Its logic touches on multiple layers of abstraction as it mixes system and node concerns. It considers node failure, message reception and node state alteration.
 
-As these two lines are so different, equivalence is certainly not obvious to a user. Proving equivalence of pseudo-code and Ivy language specification would certainly be a non-trivial proof exercise that certainly trumps manually proving \textit{Floodset}'s correctness in difficulty.
+As these two lines are so different, equivalence may not be obvious to a user. Proving equivalence of pseudo-code and Ivy language specification would be a non-trivial proof exercise that certainly trumps manually proving \textit{Floodset}'s correctness in difficulty.
 
 \subsubsection{Lack of modularity}
-Furthermore, it has already been shown in section \textbf{IV. i.1} that the lack of easy iteration over types makes it difficult to achieve modularity. The lack of which introduces additional uncertainty about correct modelling, especially in distributed systems.
+Furthermore, it has already been shown in section \textit{IV. i.1} that the lack of easy iteration over types makes it difficult to achieve modularity. The lack of which introduces additional uncertainty about correct modelling, especially in distributed systems.
 
 
 \subsection{Accidental invalidation of legal state configurations with \textit{assume}}
@@ -1005,7 +1004,7 @@ Of course this approach would not constitute a proof of correct \textit{framewor
 
 \subsection{Necessity of deep understanding}
 It has become apparent, that successful verification with IVy is not possible without deep knowledge about how the algorithm functions. Ivy is not a ``translate and go'' solution.
-Evidence of this include the complex invariant that requires knowledge about \textit{Lemma 1} or the alternative encoding for $f<n$ and the decision condition $if\ rounds = f+1$ that had to be discovered.
+Evidence of this include the complex invariant that requires knowledge about \textit{lemma 1} or the alternative encoding for $f<n$ and the decision condition $if\ rounds = f+1$.
 
 \subsection{Algorithm failure in theory and practice}
 As a user it is important to understand that Ivy's goal is to verify algorithmic correctness on a high level. It does not concern itself with implementation details. However, a variety of bugs and exploits do not stem from logically unsound algorithmic foundations but implementation errors. A wonderful example is the Heartbleed exploit in OpenSSL. It would have been no help to verify the Heartbeat protocol in IVy before implementing it in C, since the error was in an implementation detail allowing a buffer underflow. The Ivy user must realise, that the implementation of the algorithm must be tested through unit testing and/or bounded model checkers, despite successful verification in IVy.
@@ -1029,16 +1028,14 @@ Therefore, if a user is capable of navigating the limitations with care, IVy is 
 
 \section{Conclusion}
 This paper has presented the Ivy system and important Ivy language features. It classified IVy
-as part of a three step process of algorithm verification.
+as part of a two step process of algorithm verification.
 It explained that its usage requires a readiness to let go of procedural programming paradigms
 in favor of the logic oriented language. It gave an explanation of induction and inductive invariants,
 explaining what they are, how they are used by IVy to prove correctness and how they can be found.
 It presented some of the systems capabilities to verify distributed algorithms by example.
 
-It pointed out some limitations. One being that it is hard to know an algorithm was correctly specified in IVy. This is due to
-the lack of easy type iteration, which leads to complicated global assignments and a non-modular structure that is far off
-the original algorithm's.
-The paper suggested a mechanism to verify the possibility of a state to occur, to alleviate this uncertainty.
+It pointed out some limitations. One being that it is hard to know an algorithm was correctly translated into the IVy language, as a one-to-one translation from a procedural algorithm is unlikely. This is due to the lack of easy type iteration, which leads to complicated global assignments and a non-modular structure that is far off the original algorithm's.
+Furthermore, the system context may easily be miss-specified. The paper suggested a mechanism to verify the possibility of a state to occur, to alleviate this problem.
 Another limitation that was found, is the difference between a logically sound algorithm and a correctly implemented one, and how IVy can only verify the former.
 It was stressed that successful verification of an algorithm that is not thoroughly understood by the user is unlikely.
 
