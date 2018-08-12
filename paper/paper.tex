@@ -980,28 +980,28 @@ As has been pointed out, it is not just the algorithm that must be correctly spe
 
 In general, the user is left with the question ``does my \textit{framework}-specification correctly allow for X to happen''.  Users may therefore want to verify, that their specification allows a certain state to occur. In regard to Lynch's \textit{framework} the user may wish to check that a node can fail during message delivery, resulting in partial message delivery.
 
-The author of this paper used the following approach to find out if he encoded node failure correctly:
+One may use the following approach to verify that a particular system state is reachable:
 \begin{enumerate}
-  \item Construct an assertion describing the system state that should be allowed to occur
-  \item Negate the assertion
-  \item Add the assertion to an appropriate location in the specification
-  \item Check that assertion fails
-  \item Remove assertion
+  \item Construct a formula, $\gamma$, describing the system state in question.
+  \item Negate the formula, $\neg\gamma$.
+  \item Add \textit{assert} $\neg\gamma$ to an appropriate location in the specification.
+  \item Check that the assertion fails.
+  \item Remove the assertion.
 \end{enumerate}
 
 \noindent For example, one may insert
 \begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
-ensure ~(node.failed(N) &
+assert ~(exists N . node.failed(N) &
         (exists J . ~incoming_message(J,N) &
           exists K . incomming_message(K,N) & J~=N & K~=J & N~=K))
 \end{lstlisting}
 \end{mdframed}
-after the \textit{simulate\_failure} action. The assertion checks that a node cannot fail and not deliver a message to J while successfully delivering a message to K. If IVy does not find a counterexample to this assertion, it means that the specification does not allow partial message delivery. The specification would therefore be erroneous. One has to finally remove the failing assertion to allow Ivy to proof induction again.
+after the \textit{simulate\_failure} action. The negated part, $\gamma$, specifies that there exists a node $N$, that failed and failed to deliver a message to $J$ while successfully delivering a message to $K$, with $N,J,K$ distinct. By negating $\gamma$, we force Ivy to construct a counterexample such that $\gamma$ is satisfied. If IVy does not find a counterexample to this assertion, it means that $\gamma$ cannot occur. In this particular case, that would mean the specification does not allow partial message delivery. The specification would therefore be erroneous. One has to finally remove the failing assertion to allow Ivy to prove induction again.
 
-In light of this, it would be beneficial to have a built in mechanism to verify the possibility of states to occur. In this case, it would allow one to verify, that the modeled system allows for the possibility of a node to fail such that it only sends messages to a subset of processes, as part of the final proof.
+In light of this, it would be beneficial to have a built in mechanism to verify the possibility of certain states to occur. In this case, it would allow one to verify, that the modeled system allows for the possibility of a node to fail such that it only sends messages to a subset of processes, as part of the final proof.
 
-Of course this approach does not constitute a proof of correct \textit{framework}-specification. It solely acts as a form of test for the user.
+Of course this approach would not constitute a proof of correct \textit{framework}-specification. It solely acts as a form of test.
 
 \subsection{Necessity of deep understanding}
 It has become apparent, that successful verification with IVy is not possible without deep knowledge about how the algorithm functions. Ivy is not a ``translate and go'' solution.
