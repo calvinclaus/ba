@@ -878,8 +878,13 @@ invariant system.clean_round_occured ->
 \end{lstlisting}
 \end{mdframed}
 
-Since it is also required that the \textit{framework} behaves correctly it makes sense to include some
-correctness conditions specifically aimed at the system.
+\subsection{Checking framework correctness}
+
+Since any check on \textit{Floodset}'s correctness assumes that the \textit{framework} has been modeled correctly, it makes sense to include correctness conditions specifically aimed at the \textit{framework} in the form of invariants. These invariants are not necessary for induction. Removing them will not cause any of Ivy's other checks to fail. Their sole purpose is to give the user confidence that the \textit{framework} is specified correctly.
+
+For example, we would like to check that $f < n$ at all times. This has nothing to do with \textit{Floodset}'s correctness and does not have to be specified for inductiveness. However, to the user it is useful to make sure that this condition is never broken. Line 4 checks $f < n$ by using the previously presented alternate encoding using an existential quantifier.
+
+This snippet also shows some other simple checks of this kind. They are annotated with comments to facilitate understanding of their purpose.
 
 \begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
 \begin{lstlisting}
@@ -900,7 +905,7 @@ invariant system.decision_round -> system.clean_round_occured
 \end{lstlisting}
 \end{mdframed}
 
-
+These invariants do not constitute a full-fledged proof of the framework being correctly modeled. For example, we have not proven that the \textit{framework} ever fails a node. This limitation will be discussed in detail in the next section.
 
 \section{Evaluation}
 
