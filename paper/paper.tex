@@ -309,7 +309,7 @@ While a complete understanding of decidability in Ivy is advantageous, to use Iv
 
 \section{Distributed Consensus Algorithms with stopping failures}
 
-The algorithm that was implemented in IVy as part of this work is called \textit{Floodset} and was taken out of Lynch's work ``Distributed Algorithms'' \cite{refNancy}.
+The algorithm that was implemented in IVy as part of this work is called \textit{Floodset} and was taken out of Lynch's book ``Distributed Algorithms'' \cite{refNancy}.
 \textit{Floodset} is a consensus algorithm for synchronous networks with failing processes.
 To understand \textit{Floodset}, one needs to first understand the aforementioned \textit{framework}/\textit{system} within which this algorithm operates, which is also defined in \cite{refNancy}.
 
@@ -342,7 +342,7 @@ The processes then repeatedly perform the following two steps \textit{synchronou
 The combinations of these two steps is a \textit{round}.
 
 \subsection{Stopping failures}
-The system presented in Lynch's work \cite{refNancy} is capable of modelling failure in a variety of ways.
+The system presented in Lynch's book \cite{refNancy} is capable of modelling failure in a variety of ways.
 This work makes use of stopping failure only. This kind of failure occurs when a process stops in the middle of its execution. With regards to the presented \textit{framework} this
 is modeled as a process failing before or after performing some instance of Step 1 or Step 2. Additionally, a process may also stop in the middle of performing Step 1. This allows
 the interesting situation in which a process has communicated its messages to some, but not all processes. It is important to note, that processes are not thought of performing
@@ -422,7 +422,7 @@ It follows from \textit{Lemma 3}, that after $f+1$ rounds at least one round, $r
 From \textit{Lemma 2} it follows that $W_i(f+1) = W_j(f+1)$. \textit{Q.e.d}.\\
 
 \noindent The Lemmas allow proving the theorem:\\
-\noindent \textbf{Thorem}:\\
+\noindent \textbf{Theorem}:\\
 \textit{Floodset} satisfies the correctness conditions.\\
 \textbf{Agreement}:\\
 From \textit{Lemma 4} we know what $W_i = W_j$ after $f+1$ rounds. Since all decision conditions are the same and only depend on $W$, agreement is satisfied.\\
