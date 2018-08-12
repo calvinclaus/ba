@@ -835,6 +835,7 @@ invariant system.decision_round <->
                           (exists V . node.decision(N,V))))
 \end{lstlisting}
 \end{mdframed}
+This invariant assumes that the system will eventually reach the decision round. However, truly verifying \textit{termination} would require checking that the system must reach the decision round, which means verifying  \textit{liveness}. Ivy theoretically allows \textit{liveness} checks by constructing a reduction of \textit{liveness} to \textit{safety} \cite{live} but this is out of the scope of this work.
 
 \subsection{Invariants for Inductiveness}
 If one were to run $ivy\_check$ on the program without specifying any
@@ -999,11 +1000,13 @@ finding inductive invariants for proving logical soundness of an algorithm relat
 \begin{thebibliography}{99}
     \bibitem{limits} K. Apt, D. Kozen ``Limits of Automatic Verification of Finite-State Concurrent Systems'', 1986, Available \textit{http://www.cs.cornell.edu/~kozen/Papers/LimitsForAutomatic.pdf}
     \bibitem{ivy} O. Padon, K. McMillan, A. Panda, M. Safiv, S. Shoham, ``Ivy: Safety Verification by Interactive Generalization'', Available \textit{https://www.cs.tau.ac.il/~odedp/ivy.pdf}
+    \bibitem{live} O. Padon, J. Hönicke, G. Losa, A. Podelski, M. Sagiv, S. Shoham, ``Reducing Liveness to Safety in First-Order Logic'', Available \textit{https://www.cs.tau.ac.il/~odedp/reducing-liveness-to-safety-in-first-order-logic/}
     \bibitem{refLanguageDoc} ``The IVy language'',  \textit{http://microsoft.github.io/ivy/language.html} [Accessed: 5.06.18], 2017
     \bibitem{invariants} ``Invariants'',  \textit{http://microsoft.github.io/ivy/examples/client\_server\_example.html} [Accessed: 5.06.18], 2017
     \bibitem{decid} ``Decidability'',  \textit{http://microsoft.github.io/ivy/decidability.html} [Accessed: 5.06.18], 2017
     \bibitem{refNancy} N. Lynch, ``Distributed algorithms'', 1996, San Francisco: Morgan Kaufmann Publishers
     \bibitem{github} C. Claus, ``BA'', \textit{https://github.com/calvinclaus/ba}, 2018
+
 \end{thebibliography}
 
 %----------------------------------------------------------------------------------------
