@@ -803,7 +803,7 @@ Combining the two principles in a single action gives the following \textit{simu
 \end{lstlisting}
 \end{mdframed}
 
-Lines 2 to 5 resemble the snippet of section \textit{vii.1}. In line 2 we choose a non-determined number of nodes to fail. The \textit{assume} in line 3 then excludes all cases where a node that already failed was chosen to fail again. Line 4 adds the newly failed nodes to the set of failed nodes. Line 5 enforces $f < n$. Since this action is only called once per round we do not need an extra relation \textit{failing\_now} presented in \textit{vii.1}.
+Lines 2 to 5 resemble the snippet of section \textit{vii.1}. In line 2 we non-deterministically choose a number of nodes to fail. The \textit{assume} in line 3 then excludes all cases where a node that already failed was chosen to fail again. Line 4 adds the newly failed nodes to the set of failed nodes. Line 5 enforces $f < n$. Since this action is only called once per round we do not need an extra relation \textit{failing\_now} presented in \textit{vii.1}.
 
 Line 7 to 12 is equivalent to the snippet of \textit{vii.2} and simulates the message sending behaviour of failing nodes.
 
@@ -953,10 +953,14 @@ correctness. However, due to a variety of reasons, absolute certainty is never a
 This section evaluates IVy's usefulness pointing out strengths and limitations that IVy users should keep in mind
 when working with the system.
 
-\subsection{Equivalence of specification and algorithm}
-One can not trivially determine, that the specification in the IVy language is logically equivalent to the actual algorithm the user wishes to verify. Whether the algorithm to be verified exists in the user's mind, in the form of pseudo-code or fully implemented in a programming language, no guarantee can be given in regards to the correctness of the translation of the algorithm into the IVy language. Some examples illustrating this difficulty will be given in the following paragraphs.
+\subsection{Specification challenges}
 
-\subsubsection{Structural difference of IVy and procedural languages}
+It has become apparent that correctly specifying an algorithm in IVy is not an easy feat. This sections summarizes and evaluates on the variety of challenges concerning correct specification that were mentioned in this paper.
+
+\subsubsection{Equivalence of specification and algorithm}
+One can not trivially determine, that the specification in the IVy language is logically equivalent to the actual algorithm the user wishes to verify. Whether the algorithm to be verified exists in the user's mind, in the form of pseudo-code or fully implemented in a programming language, no guarantee can be given in regards to the correctness of the translation of the algorithm into the IVy language. Some examples illustrating this difficulty will be given in the following paragraphs.\\
+
+\noindent \textbf{Structural difference of IVy and procedural languages}\\
 The IVy language is structurally unlike classical procedural languages. This makes it inherently challenging to achieve a one-to-one translation from a classical distributed algorithm, that was specified in a procedural way, like \textit{Floodset}. An example of this structural difference is the relatively complicated quantifier-logic in assignments that update the global network state. Take as an example the first line of \textit{step2}:
 
 \begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
@@ -979,41 +983,12 @@ node.w(N,V) := (node.w(N,V) |
 
 This comparison clearly shows the complex structural differences. While the pseudo-code is concerned only with state alteration of a single node, the IVy language code simultaneously alters the state of all nodes. It uses an existential quantifier nested within a term. Its logic touches on multiple layers of abstraction as it mixes system and node concerns. It considers node failure, message reception and node state alteration.
 
-As these two lines are so different, equivalence may not be obvious to a user. Proving equivalence of pseudo-code and IVy language specification would be a non-trivial proof exercise that certainly trumps manually proving \textit{Floodset}'s correctness in difficulty.
+As these two lines are so different, equivalence may not be obvious to a user. Proving equivalence of pseudo-code and IVy language specification would be a non-trivial proof exercise that certainly trumps manually proving \textit{Floodset}'s correctness in difficulty. \\
 
-\subsubsection{Lack of modularity}
+\noindent \textbf{Lack of modularity}\\
 Furthermore, it has already been shown in section \textit{IV. i.1} that the lack of easy iteration over types makes it difficult to achieve modularity. The lack of which introduces additional uncertainty about correct modelling, especially in distributed systems.
 
-
-\subsection{Accidental invalidation of legal state configurations with \textit{assume}}
-$assume$ statements may silently invalidate state configurations. They therefore pose a threat as they
-may allow false-positive IVy checks.
-To give a practical example, the author of this paper originally modeled the line
-
-\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
-\begin{lstlisting}
-node.w(N,V) := (node.w(N,V) |
-               (~node.failed(N) &
-                exists J . (node.incoming_message(N,J) &
-                             node.message(J,V))));
-\end{lstlisting}
-\end{mdframed}
-
-\noindent as
-
-\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
-\begin{lstlisting}
-node.tmp_w(A,V) := node.w(A V);
-node.w(A,V) := *;
-assume node.w(A,V) <-> (node.tmp_w(A,V) |
-                        ((node.incoming_message(A,J) &
-                          node.message(J,V))));
-\end{lstlisting}
-\end{mdframed}
-The second snippet misses an existential quantifier on line 4, and therefore specifies behaviour that is unlike that of \textit{Floodset}.  The author did not discover that this $assume$ is bogus and excludes valid system states from being verified. The error only became apparent when it was discovered that correctness could be proven in the absence of an invariant that should have been absolutely necessary for induction.
-
-
-\subsection{Miss-specification of system context}
+\subsubsection{Miss-specification of system context}
 As has been pointed out, it is not just the algorithm that must be correctly specified. The underlying \textit{framework} is equally important to get right. In the presented specification it is possible to remove the \textit{simulate\_failure} action and still receive a positive check from the IVy system. This is unsurprising, as we do not have any mechanism in place verifying that the system allows nodes to fail. More subtly, a user may incorrectly simulate partial message delivery of failing nodes, however all checks would still pass.
 
 In general, the user is left with the question ``does my \textit{framework}-specification correctly allow for X to happen''.  Users may therefore want to verify, that their specification allows a certain state to occur. In regard to Lynch's \textit{framework} the user may wish to check that a node can fail during message delivery, resulting in partial message delivery.
@@ -1041,14 +1016,47 @@ In light of this, it would be beneficial to have a built in mechanism to verify 
 
 Of course this approach would not constitute a proof of correct \textit{framework}-specification. It solely acts as a form of test.
 
-\subsection{Necessity of deep understanding}
-It has become apparent, that successful verification with IVy is not possible without deep knowledge about how the algorithm functions. IVy is not a ``translate and go'' solution.
-Evidence of this include the complex invariant that requires knowledge about \textit{lemma 1} or the alternative encoding for $f<n$ and the decision condition $if\ rounds = f+1$.
+\subsubsection{Necessity of deep understanding}
+It has become apparent, that successful specification with IVy is not possible without deep knowledge about how the algorithm functions. IVy is not a ``translate and go'' solution.
+Evidence include the alternative encoding for $f<n$ and for the decision condition $if\ rounds = f+1$.
 
-\subsection{Algorithm failure in theory and practice}
-As a user it is important to understand that IVy's goal is to verify algorithmic correctness on a high level. It does not concern itself with implementation details. However, a variety of bugs and exploits do not stem from logically unsound algorithmic foundations but implementation errors. A wonderful example is the Heartbleed exploit in OpenSSL. It would have been no help to verify the Heartbeat protocol in IVy before implementing it in C, since the error was in an implementation detail allowing a buffer underflow. The IVy user must realise, that the implementation of the algorithm must be tested through unit testing and/or bounded model checkers, despite successful verification in IVy.
 
-\subsection{Time of specification and practicability}
+\subsection{Verification challenges}
+
+The following sections summarizes and evaluates on the variety of challenges concerning verification that were mentioned in this paper.
+
+\subsubsection{Accidental invalidation of legal state configurations with \textit{assume}}
+$assume$ statements may silently invalidate state configurations. They therefore pose a threat as they
+may allow false-positive IVy checks.
+To give a practical example, the author of this paper originally modeled the line
+
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{lstlisting}
+node.w(N,V) := (node.w(N,V) |
+               (~node.failed(N) &
+                exists J . (node.incoming_message(N,J) &
+                             node.message(J,V))));
+\end{lstlisting}
+\end{mdframed}
+
+\noindent as
+
+\begin{mdframed}[nobreak=true, backgroundcolor=light-gray, roundcorner=10pt,leftmargin=1, rightmargin=1, innerleftmargin=15, innertopmargin=15,innerbottommargin=15, outerlinewidth=1, linecolor=light-gray]
+\begin{lstlisting}
+node.tmp_w(A,V) := node.w(A V);
+node.w(A,V) := *;
+assume node.w(A,V) <-> (node.tmp_w(A,V) |
+                        ((node.incoming_message(A,J) &
+                          node.message(J,V))));
+\end{lstlisting}
+\end{mdframed}
+The second snippet misses an existential quantifier on line 4, and therefore specifies behaviour that is unlike that of \textit{Floodset}.  The author did not discover that this $assume$ is bogus and excludes valid system states from being verified. The error only became apparent when it was discovered that correctness could be proven in the absence of an invariant that should have been absolutely necessary for induction.
+
+\subsubsection{Hard to discover inductive invariants}
+Successfully discovering inductive invariants for \textit{Floodset} required a flawless understanding of the principles underlying the algorithm. Evidence of this includes the complex invariant that requires knowledge about \textit{lemma 1}. Users must be prepared to gain strong foundational understanding of the reasons why an algorithm works before attempting to find inductive invariants for it.
+
+
+\subsubsection{Manual effort and practicability}
 Unfortunately the author missed the opportunity to scientifically record the time commitment of verifying \textit{Floodset} in IVy. He estimates the time from starting to learn IVy to successfully proving \textit{Floodset} at around 150 hours. This surprisingly large number can be attributed to a variety of factors:
 \begin{itemize}
   \item Willingness to write a modular specification utilizing iteration.
@@ -1067,15 +1075,14 @@ For this reason, the author does not see IVy in the role of a ``quick and easy''
 
 Thus, while automatic verification is a time consuming task, it may still be useful to commit to it, as it increases confidence about algorithmic correctness alongside a manual proof.
 
+\subsubsection{Algorithm failure in theory and practice}
+As a user it is important to understand that IVy's goal is to verify algorithmic correctness on a high level. It does not concern itself with implementation details. However, a variety of bugs and exploits do not stem from logically unsound algorithmic foundations but implementation errors. A wonderful example is the Heartbleed exploit in OpenSSL. It would have been no help to verify the Heartbeat protocol in IVy before implementing it in C, since the error was in an implementation detail allowing a buffer underflow. The IVy user must realise, that the implementation of the algorithm must be tested through unit testing and/or bounded model checkers, despite successful verification in IVy.
+
 \subsection{User friendliness}
 Despite these limitations, IVy trumps similar tools in user friendliness by upping interactivity. \cite{ivy}
 IVy's counterexample to induction (CTI) viewer is remarkable, consistently showing truly minimal
 state configurations that allow the user to quickly grasp the problem. The GUI also allows stepping
 through individual lines and their effect on the state.
-
-
-Therefore, if a user is capable of navigating the limitations with care, IVy is absolutely adequate for proving the logical soundness of an algorithm.
-
 
 
 \section{Conclusion}
@@ -1091,11 +1098,9 @@ Furthermore, the system context may easily be miss-specified. The paper suggeste
 Another limitation that was found, is the difference between a logically sound algorithm and a correctly implemented one, and how IVy can only verify the former.
 It was stressed that successful verification of an algorithm that is not thoroughly understood by the user is unlikely.
 
-It highlighted the systems strengths to be user friendliness, interactivity and a powerful logic based language that allows for
-modeling of complex system state transitions in simple one-liners.
+It highlighted the systems strengths to be user friendliness, interactivity and a powerful logic based language that allows for modeling of complex system state transitions in simple one-liners.
 
-It concludes that IVy's user friendliness in presenting CTIs - so long as the user is vary of the presented limitations - enables
-finding inductive invariants for proving logical soundness of an algorithm relatively easily.
+It concludes that IVy's user friendliness in presenting CTIs - so long as the user is vary of the presented limitations - enables finding inductive invariants for proving logical soundness of an algorithm relatively easily.
 
 
 
